@@ -32,5 +32,6 @@ public class GameStandby extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         gsm.update(Gdx.graphics.getDeltaTime());
         gsm.render(batch);
+        int a=2;
     }
 }
