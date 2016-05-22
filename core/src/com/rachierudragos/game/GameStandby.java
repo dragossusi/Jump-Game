@@ -18,7 +18,7 @@ public class GameStandby extends ApplicationAdapter {
 
     private GameStateManager gsm;
     private SpriteBatch batch;
-
+    ///asd
     @Override
     public void create () {
         batch = new SpriteBatch();
