@@ -54,7 +54,8 @@ public class PlayState extends State {
         }
         if (ball.getPozitie().y < cam.position.y - 800) {
             Preferences preferences = Gdx.app.getPreferences("highscore");
-            preferences.putInteger("scor", (int)Math.floor(cam.position.y)-400);
+            preferences.putInteger("scor", (int)Math.floor(cam.position.y));
+            preferences.flush();
             gsm.set(new MenuState(gsm));
             dispose();
         }

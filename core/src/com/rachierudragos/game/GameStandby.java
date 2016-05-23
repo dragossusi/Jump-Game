@@ -18,7 +18,6 @@ public class GameStandby extends ApplicationAdapter {
 
     private GameStateManager gsm;
     private SpriteBatch batch;
-    ///asd
     @Override
     public void create () {
         batch = new SpriteBatch();
@@ -32,6 +31,5 @@ public class GameStandby extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         gsm.update(Gdx.graphics.getDeltaTime());
         gsm.render(batch);
-        int a=2;
     }
 }

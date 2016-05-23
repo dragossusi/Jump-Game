@@ -46,8 +46,14 @@ public class MenuState extends State {
         sb.draw(background, 0, 0, MyGame.WIDTH, MyGame.HEIGHT);
         sb.draw(playbtn, MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150);
         if (scor != 0) {
+            int aux=scor;
+            int xScor=235;
+            while(aux!=0) {
+                xScor-=5;
+                aux/=10;
+            }
             BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
-            font.draw(sb, String.valueOf(scor),240,600);
+            font.draw(sb, String.valueOf(scor),xScor,600);
         }
         sb.end();
     }
