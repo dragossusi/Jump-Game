@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.rachierudragos.game.MyGame;
 import com.rachierudragos.game.sprites.Ball;
 import com.rachierudragos.game.sprites.Platforma;
+
 /**
  * Created by Dragos on 19.05.2016.
  */
@@ -54,7 +55,8 @@ public class PlayState extends State {
         }
         if (ball.getPozitie().y < cam.position.y - 800) {
             Preferences preferences = Gdx.app.getPreferences("highscore");
-            preferences.putInteger("scor", (int)Math.floor(cam.position.y));
+            int scor = preferences.getInteger("scor",0);
+            preferences.putInteger("scor", Math.max((int)Math.floor(cam.position.y) - 400,scor));
             preferences.flush();
             gsm.set(new MenuState(gsm));
             dispose();
