@@ -4,8 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.rachierudragos.game.States.DreamPlayState;
 import com.rachierudragos.game.States.GameStateManager;
-import com.rachierudragos.game.States.MenuState;
 
 /**
  * Created by Dragos on 22.05.2016.
@@ -22,7 +22,7 @@ public class GameStandby extends ApplicationAdapter {
     public void create () {
         batch = new SpriteBatch();
         gsm = new GameStateManager();
-        gsm.push(new MenuState(gsm));
+        gsm.push(new DreamPlayState(gsm, true));
         Gdx.gl.glClearColor(1,1,0,1);
     }
 

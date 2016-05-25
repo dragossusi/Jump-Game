@@ -2,27 +2,35 @@ package com.rachierudragos.game.States;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import com.rachierudragos.game.MyGame;
 import com.rachierudragos.game.sprites.Ball;
 import com.rachierudragos.game.sprites.Platforma;
 
 /**
- * Created by Dragos on 19.05.2016.
+ * Created by Dragos on 23.05.2016.
  */
-public class PlayState extends State {
+public class DreamPlayState extends State {
     private static final int numarPlatforme = 7;
     private Ball ball;
     private Texture bg;
     private Array<Platforma> platforme;
     private boolean poate = true;
     private Preferences preferences;
+    private int pauza = 3;
+    //3-2-1 timp  pana incepe, 4 pierdut, 5 terminat
+    private int scor;
+    private Timer.Task asd;
 
-    protected PlayState(GameStateManager gsm) {
+    public DreamPlayState(GameStateManager gsm, boolean first) {
         super(gsm);
         ball = new Ball(50, 200);
+        ball.setStopped(true);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
         platforme = new Array<Platforma>();
@@ -31,6 +39,19 @@ public class PlayState extends State {
         }
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
+        asd = new Timer.Task() {
+            @Override
+            public void run() {
+                --pauza;
+                Gdx.app.log("pauza: ", "" + pauza);
+            }
+        };
+        if (first == true)
+            asdfg();
+    }
+
+    private void asdfg() {
+        Timer.schedule(asd, 1, 1, 2);
     }
 
     @Override
@@ -38,7 +59,6 @@ public class PlayState extends State {
         if (Gdx.input.justTouched() && poate == true) {
             ball.jump();
             poate = false;
-            ball.setStopped(false);
         }
     }
 
@@ -56,18 +76,27 @@ public class PlayState extends State {
                 ball.jump();
         }
         if (ball.getPozitie().y < cam.position.y - 800) {
-            int scor = preferences.getInteger("scor", 0);
+            scor = preferences.getInteger("scor", 0);
             int rez = Math.max((int) Math.floor(cam.position.y) - 400, scor);
             if (rez != scor) {
                 preferences.putBoolean("nou", true);
             }
             preferences.putInteger("scor", rez);
             preferences.flush();
-            gsm.set(new MenuState(gsm));
-            dispose();
+            //pierdu
+            pauza = 4;
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    pauza = 5;
+                    gsm.set(new DreamPlayState(gsm, false));
+                    dispose();
+                }
+            }, 1);
         }
         cam.update();
     }
+
 
     @Override
     public void render(SpriteBatch sb) {
@@ -78,19 +107,28 @@ public class PlayState extends State {
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
         }
-        sb.end();
-        /*collides
-        shapeRenderer = new ShapeRenderer();
-        shapeRenderer.setProjectionMatrix(cam.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.CYAN);
-        shapeRenderer.circle(ball.getAaa().x, ball.getAaa().y, 75 / 2);
-        shapeRenderer.setColor(Color.RED);
-        for (Platforma plat : platforme) {
-            shapeRenderer.rect(plat.getRectangle().x, plat.getRectangle().y, 100, 20);
+        if (pauza == 4) {
+            BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
+            font.setColor(Color.WHITE);
+            int aux = scor;
+            int xScor = 230;
+            while (aux != 0) {
+                xScor -= 12;
+                aux /= 10;
+            }
+            font.draw(sb, String.valueOf(scor), xScor, 600);
+            boolean nou = preferences.getBoolean("nou", false);
+            if (nou)
+                font.draw(sb, "New highscore!", 80, 700);
+
+        } else if (pauza == 0) {
+            ball.setStopped(false);
+        } else if (pauza > 0 && pauza < 4) {
+            BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
+            font.setColor(Color.WHITE);
+            font.draw(sb, String.valueOf(pauza), 230, 600);
         }
-        shapeRenderer.end();
-        */
+        sb.end();
     }
 
     @Override

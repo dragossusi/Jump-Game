@@ -2,6 +2,7 @@ package com.rachierudragos.game.States;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,7 +15,7 @@ public class MenuState extends State {
     private Texture background;
     private Texture playbtn;
     private int scor;
-    Preferences preferences;
+    private Preferences preferences;
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
@@ -46,14 +47,18 @@ public class MenuState extends State {
         sb.draw(background, 0, 0, MyGame.WIDTH, MyGame.HEIGHT);
         sb.draw(playbtn, MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150);
         if (scor != 0) {
-            int aux=scor;
-            int xScor=230;
-            while(aux!=0) {
-                xScor-=10;
-                aux/=10;
+            int aux = scor;
+            int xScor = 230;
+            while (aux != 0) {
+                xScor -= 12;
+                aux /= 10;
             }
             BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
-            font.draw(sb, String.valueOf(scor),xScor,600);
+            font.setColor(Color.WHITE);
+            font.draw(sb, String.valueOf(scor), xScor, 600);
+            boolean nou = preferences.getBoolean("nou", false);
+            if (nou)
+                font.draw(sb, "New highscore!", 80, 700);
         }
         sb.end();
     }
