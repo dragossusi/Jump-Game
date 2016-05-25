@@ -22,13 +22,13 @@ public class PlayState extends State {
 
     protected PlayState(GameStateManager gsm) {
         super(gsm);
-        ball = new Ball(50, 200);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
         platforme = new Array<Platforma>();
         for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
+        ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
     }

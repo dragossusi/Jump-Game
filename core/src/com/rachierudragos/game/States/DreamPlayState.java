@@ -22,21 +22,23 @@ public class DreamPlayState extends State {
     private Array<Platforma> platforme;
     private boolean poate = true;
     private Preferences preferences;
-    private int pauza = 3;
-    //3-2-1 timp  pana incepe, 4 pierdut, 5 terminat
+    private int pauza = 5;
+    //3-2-1 timp  pana incepe, 5 deruleaza
     private int scor;
+    private boolean first;
+    private boolean activ = false;
     private Timer.Task asd;
 
     public DreamPlayState(GameStateManager gsm, boolean first) {
         super(gsm);
-        ball = new Ball(50, 200);
-        ball.setStopped(true);
+        this.first = first;
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
         platforme = new Array<Platforma>();
         for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
+        ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
         asd = new Timer.Task() {
@@ -46,18 +48,23 @@ public class DreamPlayState extends State {
                 Gdx.app.log("pauza: ", "" + pauza);
             }
         };
-        if (first == true)
-            asdfg();
+        if (first == true) {
+            asdfg(asd);
+            pauza = 3;
+            ball.setStopped(true);
+        } else {
+            pauza = 5;
+            ball.setStopped(false);
+        }
     }
 
-    private void asdfg() {
-        Timer.schedule(asd, 1, 1, 2);
+    private void asdfg(Timer.Task asdf) {
+        Timer.schedule(asdf, 1, 1, 2);
     }
 
     @Override
     protected void handleInput() {
         if (Gdx.input.justTouched() && poate == true) {
-            ball.jump();
             poate = false;
         }
     }
@@ -76,23 +83,26 @@ public class DreamPlayState extends State {
                 ball.jump();
         }
         if (ball.getPozitie().y < cam.position.y - 800) {
-            scor = preferences.getInteger("scor", 0);
-            int rez = Math.max((int) Math.floor(cam.position.y) - 400, scor);
-            if (rez != scor) {
-                preferences.putBoolean("nou", true);
-            }
-            preferences.putInteger("scor", rez);
-            preferences.flush();
-            //pierdu
-            pauza = 4;
-            Timer.schedule(new Timer.Task() {
-                @Override
-                public void run() {
-                    pauza = 5;
-                    gsm.set(new DreamPlayState(gsm, false));
-                    dispose();
+            if (!activ) {
+                scor = preferences.getInteger("scor", 0);
+                int rez = Math.max((int) Math.floor(cam.position.y) - 400, scor);
+                if (rez != scor) {
+                    preferences.putBoolean("nou", true);
                 }
-            }, 1);
+                preferences.putInteger("scor", rez);
+                preferences.flush();
+                //pierdu
+                pauza = 3;
+                Timer.Task task = new Timer.Task() {
+                    @Override
+                    public void run() {
+                        --pauza;
+                        Gdx.app.log("pauza: ", "" + pauza);
+                    }
+                };
+                asdfg(task);
+                activ = true;
+            }
         }
         cam.update();
     }
@@ -107,26 +117,35 @@ public class DreamPlayState extends State {
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
         }
-        if (pauza == 4) {
-            BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
-            font.setColor(Color.WHITE);
-            int aux = scor;
-            int xScor = 230;
-            while (aux != 0) {
-                xScor -= 12;
-                aux /= 10;
+        if (pauza == 0) {
+            //timer mort
+            if (first == true) {
+                ball.setStopped(false);
+                first = false;
+            } else {
+                gsm.set(new DreamPlayState(gsm, false));
+                dispose();
+                Gdx.app.log("pauza: ", "" + pauza);
             }
-            font.draw(sb, String.valueOf(scor), xScor, 600);
-            boolean nou = preferences.getBoolean("nou", false);
-            if (nou)
-                font.draw(sb, "New highscore!", 80, 700);
-
-        } else if (pauza == 0) {
-            ball.setStopped(false);
-        } else if (pauza > 0 && pauza < 4) {
+        } else if (pauza >= 1 && pauza <= 3) {
+            if (!first) {
+                //pierdu
+                BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
+                font.setColor(Color.WHITE);
+                int aux = scor;
+                int xScor = 230;
+                while (aux != 0) {
+                    xScor -= 12;
+                    aux /= 10;
+                }
+                font.draw(sb, String.valueOf((int) Math.floor(cam.position.y) - 400), xScor, cam.position.y + 200);
+                boolean nou = preferences.getBoolean("nou", false);
+                if (nou)
+                    font.draw(sb, "New highscore!", 80, cam.position.y + 300);
+            }
             BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
             font.setColor(Color.WHITE);
-            font.draw(sb, String.valueOf(pauza), 230, 600);
+            font.draw(sb, String.valueOf(pauza), 230, cam.position.y + 100);
         }
         sb.end();
     }
