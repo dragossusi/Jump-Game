@@ -119,13 +119,13 @@ public class DreamPlayState extends State {
         }
         if (pauza == 0) {
             //timer mort
-            if (first == true) {
-                ball.setStopped(false);
-                first = false;
-            } else {
+            if (first == false) {
                 gsm.set(new DreamPlayState(gsm, false));
                 dispose();
                 Gdx.app.log("pauza: ", "" + pauza);
+            } else {
+                ball.setStopped(false);
+                first = false;
             }
         } else if (pauza >= 1 && pauza <= 3) {
             if (!first) {
