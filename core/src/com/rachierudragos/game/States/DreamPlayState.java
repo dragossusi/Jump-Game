@@ -119,13 +119,12 @@ public class DreamPlayState extends State {
         }
         if (pauza == 0) {
             //timer mort
-            if (first == false) {
+            if (activ) {
                 gsm.set(new DreamPlayState(gsm, false));
                 dispose();
                 Gdx.app.log("pauza: ", "" + pauza);
             } else {
                 ball.setStopped(false);
-                first = false;
             }
         } else if (pauza >= 1 && pauza <= 3) {
             if (!first) {
@@ -138,7 +137,8 @@ public class DreamPlayState extends State {
                     xScor -= 12;
                     aux /= 10;
                 }
-                font.draw(sb, String.valueOf((int) Math.floor(cam.position.y) - 400), xScor, cam.position.y + 200);
+                aux = (int) Math.floor(cam.position.y) - 400;
+                font.draw(sb, String.valueOf(aux), xScor, cam.position.y + 200);
                 boolean nou = preferences.getBoolean("nou", false);
                 if (nou)
                     font.draw(sb, "New highscore!", 80, cam.position.y + 300);
