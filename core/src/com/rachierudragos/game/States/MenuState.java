@@ -15,17 +15,21 @@ import com.rachierudragos.game.MyGame;
 public class MenuState extends State {
     private Texture background;
     private Texture playbtn;
+    private Texture dualplaybtn;
     private int scor;
     private Preferences preferences;
-    private Rectangle textureBounds;
+    private Rectangle collidePlayBtn;
+    private Rectangle collideDualPlayBtn;
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
         background = new Texture("bg.png");
         playbtn = new Texture("play.png");
+        dualplaybtn = new Texture("dualbutton.png");
         preferences = Gdx.app.getPreferences("highscore");
         scor = preferences.getInteger("scor", 0);
-        textureBounds = new Rectangle(MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150, 98, 40);
+        collidePlayBtn = new Rectangle(MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150, 98, 40);
+        collideDualPlayBtn = new Rectangle(MyGame.WIDTH / 2 - dualplaybtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150, 84, 40);
         Gdx.input.setCatchBackKey(false);
     }
 
@@ -36,8 +40,7 @@ public class MenuState extends State {
             float clickY = MyGame.HEIGHT - Gdx.input.getY();
             Gdx.app.log("x :", String.valueOf(clickX));
             Gdx.app.log("y :", String.valueOf(clickY));
-
-            if (textureBounds.contains(clickX, clickY)) {
+            if (collidePlayBtn.contains(clickX, clickY)) {
                 gsm.set(new PlayState(gsm));
                 dispose();
             }
@@ -57,6 +60,7 @@ public class MenuState extends State {
         sb.begin();
         sb.draw(background, 0, 0, MyGame.WIDTH, MyGame.HEIGHT);
         sb.draw(playbtn, MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150);
+        sb.draw(dualplaybtn, MyGame.WIDTH / 2 - dualplaybtn.getWidth() / 2, MyGame.HEIGHT / 2 - 100);
         if (scor != 0) {
             int aux = scor;
             int xScor = 230;
@@ -77,7 +81,7 @@ public class MenuState extends State {
         shapeRenderer.setProjectionMatrix(cam.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.CYAN);
-        shapeRenderer.rect(textureBounds.getX(),textureBounds.getY(),textureBounds.width,textureBounds.height);
+        shapeRenderer.rect(collidePlayBtn.getX(),collidePlayBtn.getY(),collidePlayBtn.width,collidePlayBtn.height);
         shapeRenderer.end();
         */
     }
