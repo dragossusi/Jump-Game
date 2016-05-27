@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.rachierudragos.game.MyGame;
 
 /**
@@ -16,6 +17,7 @@ public class MenuState extends State {
     private Texture playbtn;
     private int scor;
     private Preferences preferences;
+    private Rectangle textureBounds;
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
@@ -23,13 +25,22 @@ public class MenuState extends State {
         playbtn = new Texture("play.png");
         preferences = Gdx.app.getPreferences("highscore");
         scor = preferences.getInteger("scor", 0);
+        textureBounds = new Rectangle(MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150, 98, 40);
+        Gdx.input.setCatchBackKey(false);
     }
 
     @Override
     public void handleInput() {
         if (Gdx.input.justTouched()) {
-            gsm.set(new PlayState(gsm));
-            dispose();
+            float clickX = Gdx.input.getX();
+            float clickY = MyGame.HEIGHT - Gdx.input.getY();
+            Gdx.app.log("x :", String.valueOf(clickX));
+            Gdx.app.log("y :", String.valueOf(clickY));
+
+            if (textureBounds.contains(clickX, clickY)) {
+                gsm.set(new PlayState(gsm));
+                dispose();
+            }
         }
     }
 
@@ -61,6 +72,14 @@ public class MenuState extends State {
                 font.draw(sb, "New highscore!", 80, 700);
         }
         sb.end();
+        /*
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.CYAN);
+        shapeRenderer.rect(textureBounds.getX(),textureBounds.getY(),textureBounds.width,textureBounds.height);
+        shapeRenderer.end();
+        */
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.rachierudragos.game.States;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,7 +12,7 @@ import com.rachierudragos.game.sprites.Platforma;
 /**
  * Created by Dragos on 19.05.2016.
  */
-public class PlayState extends State {
+public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
     private Ball ball;
     private Texture bg;
@@ -21,7 +20,7 @@ public class PlayState extends State {
     private boolean poate = true;
     private Preferences preferences;
 
-    protected PlayState(GameStateManager gsm) {
+    protected DualPlayState(GameStateManager gsm) {
         super(gsm);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
@@ -32,7 +31,6 @@ public class PlayState extends State {
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
-        Gdx.input.setCatchBackKey(true);
     }
 
     @Override
@@ -41,10 +39,6 @@ public class PlayState extends State {
             ball.jump();
             poate = false;
             ball.setStopped(false);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.BACK)) {
-            gsm.set(new MenuState(gsm));
-            dispose();
         }
     }
 
