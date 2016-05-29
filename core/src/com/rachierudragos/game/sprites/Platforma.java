@@ -16,14 +16,6 @@ public class Platforma {
     private Random rand;
     private Rectangle collision;
 
-    public Texture getPlatforma() {
-        return platforma;
-    }
-
-    public Vector2 getPozitie() {
-        return pozitie;
-    }
-
     public Platforma(float y) {
         platforma = new Texture("platforma.png");
         rand = new Random();
@@ -31,6 +23,20 @@ public class Platforma {
         pozitie = new Vector2(xx, y);
         collision = new Rectangle(xx, y, 120, 20);
 
+    }
+
+    public Platforma(float y, float x) {
+        platforma = new Texture("platforma.png");
+        pozitie = new Vector2(x, y);
+        collision = new Rectangle(x, y, 120, 20);
+    }
+
+    public Texture getPlatforma() {
+        return platforma;
+    }
+
+    public Vector2 getPozitie() {
+        return pozitie;
     }
 
     public Rectangle getRectangle() {

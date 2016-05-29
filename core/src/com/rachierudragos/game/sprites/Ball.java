@@ -16,7 +16,7 @@ public class Ball {
     private Texture ball;
     private boolean stopped;
 
-    public Ball(int x, int y) {
+    public Ball(float x, float y) {
         pozitie = new Vector3(x, y, 0);
         viteza = new Vector3(0, 0, 0);
         ball = new Texture("rsz_ball.png");
@@ -60,10 +60,9 @@ public class Ball {
         viteza.y = 800;
     }
 
-    public void setPozitie(int x, int y) {
+    public void setPozitie(float x, float y) {
         this.pozitie.x = x;
         this.pozitie.y = y;
-        jump();
     }
 
     public void setStopped(boolean stopped) {

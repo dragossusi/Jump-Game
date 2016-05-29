@@ -2,16 +2,22 @@ package com.rachierudragos.game.States;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.rachierudragos.game.MyGame;
 import com.rachierudragos.game.sprites.Ball;
-import com.rachierudragos.game.sprites.DualBall;
 import com.rachierudragos.game.sprites.Platforma;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -24,8 +30,7 @@ public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
     String id;
     boolean conectat = false;
-    DualBall dualBall;
-    Texture dualBallTexture;
+    HashMap<String, Ball> mingi;
     private Ball ball;
     private Texture bg;
     private Array<Platforma> platforme;
@@ -38,13 +43,14 @@ public class DualPlayState extends State {
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
         platforme = new Array<Platforma>();
-        for (int i = 1; i <= numarPlatforme; ++i) {
+        platforme.add(new Platforma(120, 200));
+        for (int i = 2; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
-        dualBallTexture = new Texture("rsz_ball.png");
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
+        mingi = new HashMap<String, Ball>();
         connectSocket();
         configSocketEvents();
     }
@@ -54,7 +60,6 @@ public class DualPlayState extends State {
             @Override
             public void call(Object... args) {
                 Gdx.app.log("SocketIO", " Connected");
-                dualBall = new DualBall(dualBallTexture);
             }
         }).on("socketID", new Emitter.Listener() {
             @Override
@@ -75,8 +80,37 @@ public class DualPlayState extends State {
                     conectat = true;
                     id = data.getString("id");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
+                    mingi.put(id, new Ball(ball.getPozitie().x, ball.getPozitie().y));
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
+                }
+            }
+        }).on("playerDisconnected", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject data = (JSONObject) args[0];
+                try {
+                    id = data.getString("id");
+                    conectat = false;
+                } catch (JSONException e) {
+                    Gdx.app.log("SocketIO", "Error getting New PlayerID");
+                }
+            }
+        }).on("getPlayers", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONArray objects = (JSONArray) args[0];
+                if (objects.length() != 0) conectat = true;
+                try {
+                    for (int i = 0; i < objects.length(); ++i) {
+                        Vector2 position = new Vector2();
+                        position.x = ((Double) objects.getJSONObject(i).getDouble("x")).floatValue();
+                        position.y = ((Double) objects.getJSONObject(i).getDouble("y")).floatValue();
+                        Ball mingiuk = new Ball(position.y, position.x);
+                        mingi.put(objects.getJSONObject(i).getString("id"), mingiuk);
+                    }
+                } catch (JSONException e) {
+
                 }
             }
         });
@@ -93,7 +127,7 @@ public class DualPlayState extends State {
 
     @Override
     protected void handleInput() {
-        if (Gdx.input.justTouched() && poate == true) {
+        if (Gdx.input.justTouched() && poate == true && conectat == true) {
             ball.jump();
             poate = false;
             ball.setStopped(false);
@@ -131,16 +165,15 @@ public class DualPlayState extends State {
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
-        if (dualBall != null) {
-            Gdx.app.log("o ", "desenez " + ball.getPozitie());
-            //da nu vrea s-o deseneze boolanjiul
-            dualBall.draw(sb);
-        }
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);
-        if (conectat == true)
-            sb.draw(ball.getBall(), ball.getPozitie().x, ball.getPozitie().y);
-        else {
-
+        for (Map.Entry<String, Ball> entry : mingi.entrySet()) {
+            sb.draw(entry.getValue().getBall(), entry.getValue().getPozitie().x, entry.getValue().getPozitie().y);
+        }
+        sb.draw(ball.getBall(), ball.getPozitie().x, ball.getPozitie().y);
+        if (!conectat) {
+            BitmapFont font = new BitmapFont(Gdx.files.internal("fontsmaller.fnt"));
+            font.setColor(Color.WHITE);
+            font.draw(sb, "Stai sa se conecteze prostu...", 30, 700);
         }
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
@@ -155,6 +188,5 @@ public class DualPlayState extends State {
         for (Platforma plat : platforme) {
             plat.getPlatforma().dispose();
         }
-        dualBallTexture.dispose();
     }
 }
