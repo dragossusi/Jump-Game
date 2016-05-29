@@ -45,8 +45,8 @@ public class DualPlayState extends State {
         bg = new Texture("oras.jpg");
         ballTexture = new Texture("rsz_ball.png");
         platforme = new Array<Platforma>();
-        platforme.add(new Platforma(120, 200));
-        for (int i = 2; i <= numarPlatforme; ++i) {
+        //platforme.add(new Platforma(120, 200));
+        for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
@@ -93,7 +93,9 @@ public class DualPlayState extends State {
                 JSONObject data = (JSONObject) args[0];
                 try {
                     id = data.getString("id");
-                    conectat = false;
+                    mingi.remove(id);
+                    if (mingi.size() == 0)
+                        conectat = false;
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
@@ -108,8 +110,7 @@ public class DualPlayState extends State {
                         Vector2 position = new Vector2();
                         position.x = ((Double) objects.getJSONObject(i).getDouble("x")).floatValue();
                         position.y = ((Double) objects.getJSONObject(i).getDouble("y")).floatValue();
-                        Ball mingiuk = new Ball(position.y, position.x);
-                        mingi.put(objects.getJSONObject(i).getString("id"), mingiuk);
+                        mingi.put(objects.getJSONObject(i).getString("id"), new Ball(position.y, position.x));
                     }
                 } catch (JSONException e) {
 
