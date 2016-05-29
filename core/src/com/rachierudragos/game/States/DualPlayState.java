@@ -33,6 +33,7 @@ public class DualPlayState extends State {
     HashMap<String, Ball> mingi;
     private Ball ball;
     private Texture bg;
+    private Texture ballTexture;
     private Array<Platforma> platforme;
     private boolean poate = true;
     private Preferences preferences;
@@ -42,6 +43,7 @@ public class DualPlayState extends State {
         super(gsm);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
+        ballTexture = new Texture("rsz_ball.png");
         platforme = new Array<Platforma>();
         platforme.add(new Platforma(120, 200));
         for (int i = 2; i <= numarPlatforme; ++i) {
@@ -167,9 +169,9 @@ public class DualPlayState extends State {
         sb.begin();
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);
         for (Map.Entry<String, Ball> entry : mingi.entrySet()) {
-            sb.draw(entry.getValue().getBall(), entry.getValue().getPozitie().x, entry.getValue().getPozitie().y);
+            sb.draw(ballTexture, entry.getValue().getPozitie().x, entry.getValue().getPozitie().y);
         }
-        sb.draw(ball.getBall(), ball.getPozitie().x, ball.getPozitie().y);
+        sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         if (!conectat) {
             BitmapFont font = new BitmapFont(Gdx.files.internal("fontsmaller.fnt"));
             font.setColor(Color.WHITE);
@@ -184,7 +186,7 @@ public class DualPlayState extends State {
     @Override
     public void dispose() {
         bg.dispose();
-        ball.getBall().dispose();
+        ballTexture.dispose();
         for (Platforma plat : platforme) {
             plat.getPlatforma().dispose();
         }

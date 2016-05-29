@@ -1,7 +1,6 @@
 package com.rachierudragos.game.sprites;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector3;
 
@@ -13,13 +12,11 @@ public class Ball {
     private Vector3 pozitie;
     private Vector3 viteza;
     private Circle aaa;
-    private Texture ball;
     private boolean stopped;
 
     public Ball(float x, float y) {
         pozitie = new Vector3(x, y, 0);
         viteza = new Vector3(0, 0, 0);
-        ball = new Texture("rsz_ball.png");
         aaa = new Circle();
         aaa.set(pozitie.x, pozitie.y, 75 / 2);
         stopped = true;
@@ -31,10 +28,6 @@ public class Ball {
 
     public Vector3 getPozitie() {
         return pozitie;
-    }
-
-    public Texture getBall() {
-        return ball;
     }
 
     public void update(float dt) {

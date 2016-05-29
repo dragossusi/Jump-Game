@@ -19,6 +19,7 @@ public class DreamPlayState extends State {
     private static final int numarPlatforme = 7;
     private Ball ball;
     private Texture bg;
+    private Texture ballTexture;
     private Array<Platforma> platforme;
     private boolean poate = true;
     private Preferences preferences;
@@ -34,6 +35,7 @@ public class DreamPlayState extends State {
         this.first = first;
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
+        ballTexture = new Texture("rsz_ball.png");
         platforme = new Array<Platforma>();
         for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
@@ -113,7 +115,7 @@ public class DreamPlayState extends State {
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);
-        sb.draw(ball.getBall(), ball.getPozitie().x, ball.getPozitie().y);
+        sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
         }
@@ -153,7 +155,7 @@ public class DreamPlayState extends State {
     @Override
     public void dispose() {
         bg.dispose();
-        ball.getBall().dispose();
+        ballTexture.dispose();
         for (Platforma plat : platforme) {
             plat.getPlatforma().dispose();
         }
