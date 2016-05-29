@@ -23,6 +23,7 @@ import io.socket.emitter.Emitter;
 public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
     String id;
+    boolean conectat = false;
     DualBall dualBall;
     Texture dualBallTexture;
     private Ball ball;
@@ -71,6 +72,7 @@ public class DualPlayState extends State {
             public void call(Object... args) {
                 JSONObject data = (JSONObject) args[0];
                 try {
+                    conectat = true;
                     id = data.getString("id");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
                 } catch (JSONException e) {
@@ -130,27 +132,20 @@ public class DualPlayState extends State {
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         if (dualBall != null) {
-            Gdx.app.log("o ", "desenez");
-            sb.draw(dualBallTexture, ball.getPozitie().x, ball.getPozitie().y);
+            Gdx.app.log("o ", "desenez " + ball.getPozitie());
+            //da nu vrea s-o deseneze boolanjiul
+            dualBall.draw(sb);
         }
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);
-        sb.draw(ball.getBall(), ball.getPozitie().x, ball.getPozitie().y);
+        if (conectat == true)
+            sb.draw(ball.getBall(), ball.getPozitie().x, ball.getPozitie().y);
+        else {
+
+        }
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
         }
         sb.end();
-        /*collides
-        shapeRenderer = new ShapeRenderer();
-        shapeRenderer.setProjectionMatrix(cam.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.CYAN);
-        shapeRenderer.circle(ball.getAaa().x, ball.getAaa().y, 75 / 2);
-        shapeRenderer.setColor(Color.RED);
-        for (Platforma plat : platforme) {
-            shapeRenderer.rect(plat.getRectangle().x, plat.getRectangle().y, 100, 20);
-        }
-        shapeRenderer.end();
-        */
     }
 
     @Override
