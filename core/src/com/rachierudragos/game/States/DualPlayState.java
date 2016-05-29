@@ -7,18 +7,30 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.rachierudragos.game.MyGame;
 import com.rachierudragos.game.sprites.Ball;
+import com.rachierudragos.game.sprites.DualBall;
 import com.rachierudragos.game.sprites.Platforma;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 /**
  * Created by Dragos on 19.05.2016.
  */
 public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
+    String id;
+    DualBall dualBall;
+    Texture dualBallTexture;
     private Ball ball;
     private Texture bg;
     private Array<Platforma> platforme;
     private boolean poate = true;
     private Preferences preferences;
+    private Socket socket;
 
     protected DualPlayState(GameStateManager gsm) {
         super(gsm);
@@ -29,8 +41,52 @@ public class DualPlayState extends State {
             platforme.add(new Platforma(i * 120));
         }
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
+        dualBallTexture = new Texture("rsz_ball.png");
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
+        connectSocket();
+        configSocketEvents();
+    }
+
+    public void configSocketEvents() {
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Gdx.app.log("SocketIO", " Connected");
+                dualBall = new DualBall(dualBallTexture);
+            }
+        }).on("socketID", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject data = (JSONObject) args[0];
+                try {
+                    id = data.getString("id");
+                    Gdx.app.log("SocketIO", " My ID = " + id);
+                } catch (JSONException e) {
+                    Gdx.app.log("SocketIO", String.valueOf(e));
+                }
+            }
+        }).on("newPlayer", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject data = (JSONObject) args[0];
+                try {
+                    id = data.getString("id");
+                    Gdx.app.log("SocketIO", "New Player Connect: " + id);
+                } catch (JSONException e) {
+                    Gdx.app.log("SocketIO", "Error getting New PlayerID");
+                }
+            }
+        });
+    }
+
+    private void connectSocket() {
+        try {
+            socket = IO.socket("http://localhost:8080");
+            socket.connect();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     @Override
@@ -73,6 +129,10 @@ public class DualPlayState extends State {
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
+        if (dualBall != null) {
+            Gdx.app.log("o ", "desenez");
+            sb.draw(dualBallTexture, ball.getPozitie().x, ball.getPozitie().y);
+        }
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);
         sb.draw(ball.getBall(), ball.getPozitie().x, ball.getPozitie().y);
         for (Platforma plat : platforme) {
@@ -100,5 +160,6 @@ public class DualPlayState extends State {
         for (Platforma plat : platforme) {
             plat.getPlatforma().dispose();
         }
+        dualBallTexture.dispose();
     }
 }
