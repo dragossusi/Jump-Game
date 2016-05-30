@@ -13,6 +13,7 @@ public class Ball {
     private Vector3 viteza;
     private Circle aaa;
     private boolean stopped;
+    private boolean miscabil;
 
     public Ball(float x, float y) {
         pozitie = new Vector3(x, y, 0);
@@ -20,6 +21,7 @@ public class Ball {
         aaa = new Circle();
         aaa.set(pozitie.x, pozitie.y, 75 / 2);
         stopped = true;
+        miscabil = false;
     }
 
     public Vector3 getViteza() {
@@ -36,14 +38,16 @@ public class Ball {
                 viteza.add(0, GRAVITY, 0);
             viteza.scl(dt);
             pozitie.add(0, viteza.y, 0);
-            float acceleration = Gdx.input.getAccelerometerX();
-            if (Math.abs(acceleration) > 0.3f) {
-                pozitie.x -= acceleration * 100 * dt;
+            if (miscabil) {
+                float acceleration = Gdx.input.getAccelerometerX();
+                if (Math.abs(acceleration) > 0.3f) {
+                    pozitie.x -= acceleration * 100 * dt;
+                }
+                if (pozitie.x > 480)
+                    pozitie.x -= 480;
+                else if (pozitie.x < 0)
+                    pozitie.x += 480;
             }
-            if (pozitie.x > 480)
-                pozitie.x -= 480;
-            else if (pozitie.x < 0)
-                pozitie.x += 480;
             viteza.scl(1 / dt);
         }
         aaa.setPosition(pozitie.x + 75 / 2, pozitie.y + 75 / 2);
@@ -60,6 +64,14 @@ public class Ball {
 
     public void setStopped(boolean stopped) {
         this.stopped = stopped;
+    }
+
+    public boolean isMiscabil() {
+        return miscabil;
+    }
+
+    public void setMiscabil(boolean miscabil) {
+        this.miscabil = miscabil;
     }
 
     public Circle getAaa() {

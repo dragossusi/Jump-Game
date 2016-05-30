@@ -22,6 +22,7 @@ public class MenuState extends State {
     private Preferences preferences;
     private Rectangle collidePlayBtn;
     private Rectangle collideDualPlayBtn;
+    private boolean creez = false;
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
@@ -48,26 +49,25 @@ public class MenuState extends State {
                 gsm.set(new PlayState(gsm));
                 dispose();
             } else if (collideDualPlayBtn.contains(input.x, input.y)) {
-                final boolean[] add = new boolean[1];
-                final String[] nume = new String[1];
                 Gdx.input.getTextInput(new Input.TextInputListener() {
                     @Override
                     public void input(String text) {
-                        add[0] = true;
-                        nume[0] = text;
+                        creez = true;
+                        preferences.putString("nume", text).flush();
+                        Gdx.app.log("nume ", text);
                     }
 
                     @Override
                     public void canceled() {
-                        add[0] = false;
+                        creez = false;
                     }
                 }, "Numele jucatorului:", "", "Georgel");
-                if (add[0]) {
-                    preferences.putString("nume", nume[0]).flush();
-                    gsm.set(new DualPlayState(gsm));
-                    dispose();
-                }
+
             }
+        }
+        if (creez) {
+            gsm.set(new DualPlayState(gsm));
+            dispose();
         }
     }
 

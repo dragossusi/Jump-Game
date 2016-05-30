@@ -56,8 +56,9 @@ public class DualPlayState extends State {
             platforme.add(new Platforma(i * 120));
         }
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
+        ball.setStopped(false);
         preferences = Gdx.app.getPreferences("highscore");
-        preferences.putBoolean("nou", false).flush();
+        //preferences.putBoolean("nou", false).flush();
         Gdx.input.setCatchBackKey(true);
         mingi = new HashMap<String, Ball>();
         nume = new HashMap<String, String>();
@@ -92,7 +93,7 @@ public class DualPlayState extends State {
                     String playerName = data.getString("nume");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
                     mingi.put(playerId, new Ball(ball.getPozitie().x, ball.getPozitie().y));
-                    mingi.put(playerId, )
+                    nume.put(playerId, playerName);
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
@@ -104,6 +105,7 @@ public class DualPlayState extends State {
                 try {
                     String playerId = data.getString("id");
                     mingi.remove(playerId);
+                    nume.remove(playerId);
                     if (mingi.size() == 0) {
                         gsm.set(new MenuState(gsm));
                         dispose();
@@ -138,6 +140,7 @@ public class DualPlayState extends State {
                         position.x = ((Double) objects.getJSONObject(i).getDouble("x")).floatValue();
                         position.y = ((Double) objects.getJSONObject(i).getDouble("y")).floatValue();
                         mingi.put(objects.getJSONObject(i).getString("id"), new Ball(position.y, position.x));
+                        nume.put(objects.getJSONObject(i).getString("id"), objects.getJSONObject(i).getString("nume"));
                     }
                 } catch (JSONException e) {
 
@@ -162,8 +165,12 @@ public class DualPlayState extends State {
 
     private void connectSocket() {
         try {
-            socket = IO.socket("http://habarnuam-64071.onmodulus.net:80");
+            //socket = IO.socket("http://habarnuam-64071.onmodulus.net:80");
+            socket = IO.socket("http://localhost:8080");
             socket.connect();
+            JSONObject data = new JSONObject();
+            data.put("nume", preferences.getString("nume", ""));
+            socket.emit("setName", data);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -193,8 +200,12 @@ public class DualPlayState extends State {
             if (cam.position.y - cam.viewportHeight / 2 > plat.getPozitie().y + 20) {
                 plat.reposition(plat.getPozitie().y + 120 * numarPlatforme);
             }
-            if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y)
-                ball.jump();
+            if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y - 5)
+                if (!ball.isMiscabil()) {
+                    if (ball.getPozitie().y < platforme.get(1).getPozitie().y) {
+                        ball.jump();
+                    }
+                } else ball.jump();
         }
         if (ball.getPozitie().y < cam.position.y - 800) {
             int scor = preferences.getInteger("scor", 0);
