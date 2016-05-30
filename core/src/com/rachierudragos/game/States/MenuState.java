@@ -1,12 +1,14 @@
 package com.rachierudragos.game.States;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.rachierudragos.game.MyGame;
 
 /**
@@ -37,15 +39,34 @@ public class MenuState extends State {
     public void handleInput() {
         if (Gdx.input.justTouched()) {
             float clickX = Gdx.input.getX();
-            float clickY = MyGame.HEIGHT - Gdx.input.getY();
-            Gdx.app.log("x :", String.valueOf(clickX));
-            Gdx.app.log("y :", String.valueOf(clickY));
-            if (collidePlayBtn.contains(clickX, clickY)) {
+            float clickY = Gdx.input.getY();
+            Vector3 input = new Vector3(clickX, clickY, 0);
+            cam.unproject(input);
+            Gdx.app.log("x :", String.valueOf(input.x));
+            Gdx.app.log("y :", String.valueOf(input.y));
+            if (collidePlayBtn.contains(input.x, input.y)) {
                 gsm.set(new PlayState(gsm));
                 dispose();
-            } else if (collideDualPlayBtn.contains(clickX, clickY)) {
-                gsm.set(new DualPlayState(gsm));
-                dispose();
+            } else if (collideDualPlayBtn.contains(input.x, input.y)) {
+                final boolean[] add = new boolean[1];
+                final String[] nume = new String[1];
+                Gdx.input.getTextInput(new Input.TextInputListener() {
+                    @Override
+                    public void input(String text) {
+                        add[0] = true;
+                        nume[0] = text;
+                    }
+
+                    @Override
+                    public void canceled() {
+                        add[0] = false;
+                    }
+                }, "Numele jucatorului:", "", "Georgel");
+                if (add[0]) {
+                    preferences.putString("nume", nume[0]).flush();
+                    gsm.set(new DualPlayState(gsm));
+                    dispose();
+                }
             }
         }
     }

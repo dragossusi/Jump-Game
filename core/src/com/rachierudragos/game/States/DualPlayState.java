@@ -29,14 +29,16 @@ import io.socket.emitter.Emitter;
  */
 public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
-    private static final float UPDATE_TIME = 1 / 60f;
+    private static final float UPDATE_TIME = 1 / 120f;
     float timer;
     String id;
     boolean conectat = false;
     HashMap<String, Ball> mingi;
+    HashMap<String, String> nume;
     private Ball ball;
     private Texture bg;
     private Texture ballTexture;
+    private Texture dualball;
     private Array<Platforma> platforme;
     private boolean poate = true;
     private Preferences preferences;
@@ -44,10 +46,10 @@ public class DualPlayState extends State {
 
     protected DualPlayState(GameStateManager gsm) {
         super(gsm);
-        Gdx.input.setCatchBackKey(true);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
         ballTexture = new Texture("rsz_ball.png");
+        dualball = new Texture("dualball.png");
         platforme = new Array<Platforma>();
         //platforme.add(new Platforma(120, 200));
         for (int i = 1; i <= numarPlatforme; ++i) {
@@ -56,7 +58,9 @@ public class DualPlayState extends State {
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
+        Gdx.input.setCatchBackKey(true);
         mingi = new HashMap<String, Ball>();
+        nume = new HashMap<String, String>();
         connectSocket();
         configSocketEvents();
     }
@@ -85,8 +89,10 @@ public class DualPlayState extends State {
                 try {
                     conectat = true;
                     String playerId = data.getString("id");
+                    String playerName = data.getString("nume");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
                     mingi.put(playerId, new Ball(ball.getPozitie().x, ball.getPozitie().y));
+                    mingi.put(playerId, )
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
@@ -101,7 +107,6 @@ public class DualPlayState extends State {
                     if (mingi.size() == 0) {
                         gsm.set(new MenuState(gsm));
                         dispose();
-                        socket.disconnect();
                     }
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
@@ -210,15 +215,16 @@ public class DualPlayState extends State {
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);
-        for (Map.Entry<String, Ball> entry : mingi.entrySet()) {
-            sb.draw(ballTexture, entry.getValue().getPozitie().x, entry.getValue().getPozitie().y);
-        }
-        sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
-        if (!conectat) {
+        if (conectat) {
+            for (Map.Entry<String, Ball> entry : mingi.entrySet()) {
+                sb.draw(dualball, entry.getValue().getPozitie().x, entry.getValue().getPozitie().y);
+            }
+        } else {
             BitmapFont font = new BitmapFont(Gdx.files.internal("fontsmaller.fnt"));
             font.setColor(Color.WHITE);
             font.draw(sb, "Stai sa se conecteze prostu...", 30, 700);
         }
+        sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
         }
