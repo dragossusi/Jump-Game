@@ -12,7 +12,17 @@ io.on('connection', function(socket){
 	console.log("Player Connected!");
 	socket.emit('socketID', { id: socket.id });
 	socket.emit('getPlayers', players);
-    socket.broadcast.emit('newPlayer', { id: socket.id, nume: nume });
+    socket.broadcast.emit('newPlayer', { id: socket.id });
+    socket.on('setName', function(name) {
+        nume = name;
+    });
+    socket.on('getName', function(idd){
+        for(var i = 0; i < players.length; i++){
+        	if(players[i].id == idd){
+        		socket.emit('getName', players[i].nume);
+        	}
+        }
+    });
     socket.on('playerMoved', function(data) {
         data.id = socket.id;
         socket.broadcast.emit('playerMoved', data);

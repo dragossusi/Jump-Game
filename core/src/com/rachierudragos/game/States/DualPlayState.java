@@ -92,7 +92,7 @@ public class DualPlayState extends State {
                     String playerName = data.getString("nume");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
                     mingi.put(playerId, new Ball(ball.getPozitie().x, ball.getPozitie().y));
-                    mingi.put(playerId, )
+                    nume.put(playerId, playerName);
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
