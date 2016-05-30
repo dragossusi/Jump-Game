@@ -1,0 +1,23 @@
+{
+  "name": "dualplay",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dragossusi/gioc.git"
+  },
+  "author": "Rachieru Dragos Costel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dragossusi/gioc/issues"
+  },
+  "homepage": "https://github.com/dragossusi/gioc#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "socket.io": "^1.4.6"
+  }
+}

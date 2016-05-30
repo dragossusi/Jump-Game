@@ -1,6 +1,7 @@
 package com.rachierudragos.game.States;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -28,6 +29,8 @@ import io.socket.emitter.Emitter;
  */
 public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
+    private static final float UPDATE_TIME = 1 / 60f;
+    float timer;
     String id;
     boolean conectat = false;
     HashMap<String, Ball> mingi;
@@ -41,6 +44,7 @@ public class DualPlayState extends State {
 
     protected DualPlayState(GameStateManager gsm) {
         super(gsm);
+        Gdx.input.setCatchBackKey(true);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         bg = new Texture("oras.jpg");
         ballTexture = new Texture("rsz_ball.png");
@@ -80,9 +84,9 @@ public class DualPlayState extends State {
                 JSONObject data = (JSONObject) args[0];
                 try {
                     conectat = true;
-                    id = data.getString("id");
+                    String playerId = data.getString("id");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
-                    mingi.put(id, new Ball(ball.getPozitie().x, ball.getPozitie().y));
+                    mingi.put(playerId, new Ball(ball.getPozitie().x, ball.getPozitie().y));
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
@@ -92,10 +96,28 @@ public class DualPlayState extends State {
             public void call(Object... args) {
                 JSONObject data = (JSONObject) args[0];
                 try {
-                    id = data.getString("id");
-                    mingi.remove(id);
-                    if (mingi.size() == 0)
-                        conectat = false;
+                    String playerId = data.getString("id");
+                    mingi.remove(playerId);
+                    if (mingi.size() == 0) {
+                        gsm.set(new MenuState(gsm));
+                        dispose();
+                        socket.disconnect();
+                    }
+                } catch (JSONException e) {
+                    Gdx.app.log("SocketIO", "Error getting New PlayerID");
+                }
+            }
+        }).on("playerMoved", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject data = (JSONObject) args[0];
+                try {
+                    String playerId = data.getString("id");
+                    Double x = data.getDouble("x");
+                    Double y = data.getDouble("y");
+                    if (mingi.get(playerId) != null) {
+                        mingi.get(playerId).setPozitie(x.floatValue(), y.floatValue());
+                    }
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
@@ -119,9 +141,23 @@ public class DualPlayState extends State {
         });
     }
 
+    public void updateServer(float dt) {
+        timer += dt;
+        if (timer >= UPDATE_TIME) {
+            JSONObject data = new JSONObject();
+            try {
+                data.put("x", ball.getPozitie().x);
+                data.put("y", ball.getPozitie().y);
+                socket.emit("playerMoved", data);
+            } catch (JSONException e) {
+                Gdx.app.log("SocketIO", "Error sending update data");
+            }
+        }
+    }
+
     private void connectSocket() {
         try {
-            socket = IO.socket("http://localhost:8080");
+            socket = IO.socket("http://habarnuam-64071.onmodulus.net:80");
             socket.connect();
         } catch (Exception e) {
             System.out.println(e);
@@ -135,11 +171,16 @@ public class DualPlayState extends State {
             poate = false;
             ball.setStopped(false);
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.BACK)) {
+            gsm.set(new MenuState(gsm));
+            dispose();
+        }
     }
 
     @Override
     public void update(float dt) {
         handleInput();
+        updateServer(dt);
         ball.update(dt);
         if (ball.getPozitie().y > cam.position.y + 200)
             cam.position.y = ball.getPozitie().y - 200;
