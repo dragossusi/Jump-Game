@@ -35,10 +35,10 @@ public class DualPlayState extends State {
     HashMap<String, Ball> mingi;
     HashMap<String, String> nume;
     private Ball ball;
+    private Array<Platforma> platforme;
     private Texture bg;
     private Texture ballTexture;
     private Texture dualball;
-    private Array<Platforma> platforme;
     private boolean poate = true;
     private Preferences preferences;
     private Socket socket;
