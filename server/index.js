@@ -14,8 +14,20 @@ io.on('connection', function(socket){
 	socket.emit('socketID', { id: socket.id });
 	socket.emit('getPlayers', players);
     socket.broadcast.emit('newPlayer', { id: socket.id });
+<<<<<<< HEAD
     socket.on('setName', function(data) {
         nume = data.nume;
+=======
+    socket.on('setName', function(name) {
+        nume = name;
+    });
+    socket.on('getName', function(idd){
+        for(var i = 0; i < players.length; i++){
+        	if(players[i].id == idd){
+        		socket.emit('getName', players[i].nume);
+        	}
+        }
+>>>>>>> c391917cd15487fed8f3f5458fdd97c31d229f0f
     });
     socket.on('playerMoved', function(data) {
         data.id = socket.id;
