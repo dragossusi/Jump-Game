@@ -49,19 +49,21 @@ public class MenuState extends State {
                 gsm.set(new PlayState(gsm));
                 dispose();
             } else if (collideDualPlayBtn.contains(input.x, input.y)) {
-                Gdx.input.getTextInput(new Input.TextInputListener() {
-                    @Override
-                    public void input(String text) {
-                        creez = true;
-                        preferences.putString("nume", text).flush();
-                        Gdx.app.log("nume ", text);
-                    }
+                if (preferences.getString("nume", "").equals(""))
+                    Gdx.input.getTextInput(new Input.TextInputListener() {
+                        @Override
+                        public void input(String text) {
+                            creez = true;
+                            preferences.putString("nume", text).flush();
+                            Gdx.app.log("nume ", text);
+                        }
 
-                    @Override
-                    public void canceled() {
-                        creez = false;
-                    }
-                }, "Numele jucatorului:", "", "Georgel");
+                        @Override
+                        public void canceled() {
+                            creez = false;
+                        }
+                    }, "Numele jucatorului:", "", "Georgel");
+                else creez = true;
 
             }
         }

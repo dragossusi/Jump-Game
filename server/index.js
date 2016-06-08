@@ -10,6 +10,7 @@ server.listen(8080, function(){
 
 io.on('connection', function(socket){
 	console.log("Player Connected!");
+    players.push(new player(socket.id, nume, 0, 0));
 	socket.emit('socketID', { id: socket.id });
 	socket.emit('getPlayers', players);
     socket.broadcast.emit('newPlayer', { id: socket.id });
@@ -44,7 +45,6 @@ io.on('connection', function(socket){
         }
     });
     //////////
-    players.push(new player(socket.id, nume, 0, 0));
 });
 
 function player(id, x, y){
