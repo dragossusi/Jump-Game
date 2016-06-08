@@ -42,6 +42,8 @@ public class DualPlayState extends State {
     private boolean poate = true;
     private Preferences preferences;
     private Socket socket;
+    private BitmapFont font;
+    private GlyphLayout glyphLayout;
 
     protected DualPlayState(GameStateManager gsm) {
         super(gsm);
@@ -60,6 +62,8 @@ public class DualPlayState extends State {
         Gdx.input.setCatchBackKey(true);
         mingi = new HashMap<String, Ball>();
         nume = new HashMap<String, String>();
+        font = new BitmapFont(Gdx.files.internal("fontsmaller.fnt"));
+        glyphLayout = new GlyphLayout();
         connectSocket();
         configSocketEvents();
     }
@@ -214,8 +218,6 @@ public class DualPlayState extends State {
 
     @Override
     public void render(SpriteBatch sb) {
-        BitmapFont font = new BitmapFont(Gdx.files.internal("fontsmaller.fnt"));
-        GlyphLayout glyphLayout = new GlyphLayout();
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);

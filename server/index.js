@@ -3,11 +3,9 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var players = [];
 var nume;
-
 server.listen(8080, function(){
 	console.log("Server is now running...");
 });
-
 io.on('connection', function(socket){
 	console.log("Player Connected!");
     players.push(new player(socket.id, nume, 0, 0));
@@ -16,6 +14,7 @@ io.on('connection', function(socket){
     socket.broadcast.emit('newPlayer', { id: socket.id });
     socket.on('setName', function(data) {
         nume = data.nume;
+    });
     socket.on('setName', function(name) {
         nume = name;
     });
@@ -53,10 +52,11 @@ io.on('connection', function(socket){
         }
     });
 });
-
 function player(id, x, y){
-	this.id = id;
-	this.nume = nume;
-	this.x = x;
-	this.y = y;
-}
+ 	this.id = id;
+ 	this.nume = nume;
+ 	this.x = x;
+ 	this.y = y;
+ }
+
+
