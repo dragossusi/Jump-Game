@@ -30,10 +30,10 @@ import io.socket.emitter.Emitter;
 public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
     private static final float UPDATE_TIME = 1 / 120f;
-    float timer;
-    String id;
-    HashMap<String, Ball> mingi;
-    HashMap<String, String> nume;
+    private float timer;
+    private String id;
+    private HashMap<String, Ball> mingi;
+    private HashMap<String, String> nume;
     private Ball ball;
     private Array<Platforma> platforme;
     private Texture bg;
@@ -91,10 +91,10 @@ public class DualPlayState extends State {
                 JSONObject data = (JSONObject) args[0];
                 try {
                     String playerId = data.getString("id");
-                    //String playerName = data.getString("nume");
+                    String name = data.getString("name");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
                     mingi.put(playerId, new Ball(ball.getPozitie().x, ball.getPozitie().y));
-                    //nume.put(playerId, playerName);
+                    nume.put(playerId, name);
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
@@ -143,7 +143,7 @@ public class DualPlayState extends State {
                         Gdx.app.log("pozitie", position.x + "  " + position.y);
                     }
                 } catch (JSONException e) {
-
+                    Gdx.app.log("GetPlayers error", String.valueOf(e));
                 }
             }
         });

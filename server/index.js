@@ -8,22 +8,14 @@ server.listen(8080, function(){
 });
 io.on('connection', function(socket){
 	console.log("Player Connected!");
-    players.push(new player(socket.id, nume, 0, 0));
 	socket.emit('socketID', { id: socket.id });
-	socket.emit('getPlayers', players);
-    socket.broadcast.emit('newPlayer', { id: socket.id });
     socket.on('setName', function(data) {
-        nume = data.nume;
-    });
-    socket.on('setName', function(name) {
-        nume = name;
-    });
-    socket.on('getName', function(idd){
-        for(var i = 0; i < players.length; i++){
-        	if(players[i].id == idd){
-        		socket.emit('getName', players[i].nume);
-        	}
+        for(var i = 0; i < players.length; ++i) {
+            if(players[i].id == socket.id) {
+                players[i].nume = data.nume;
+            }
         }
+        socket.broadcast.emit('newPlayer', { id: socket.id , name: data.nume});
     });
     socket.on('playerMoved', function(data) {
         data.id = socket.id;
@@ -35,6 +27,7 @@ io.on('connection', function(socket){
         }
         socket.broadcast.emit('playerMoved', data);
     });
+	socket.emit('getPlayers', players);
 	socket.on('disconnect', function(){
 		console.log("Player Disconnected");
 		socket.broadcast.emit('playerDisconnected', { id: socket.id });
@@ -44,13 +37,7 @@ io.on('connection', function(socket){
 			}
         }
 	});
-    socket.on('getName', function(idd){
-        for(var i = 0; i < players.length; i++){
-        	if(players[i].id == idd){
-        		socket.emit('getName', players[i].nume);
-        	}
-        }
-    });
+    players.push(new player(socket.id, nume, 0, 0));
 });
 function player(id, x, y){
  	this.id = id;
@@ -58,5 +45,3 @@ function player(id, x, y){
  	this.x = x;
  	this.y = y;
  }
-
-
