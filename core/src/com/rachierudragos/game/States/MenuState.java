@@ -23,6 +23,7 @@ public class MenuState extends State {
     private Rectangle collidePlayBtn;
     private Rectangle collideDualPlayBtn;
     private boolean creez = false;
+    private BitmapFont font;
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
@@ -33,6 +34,7 @@ public class MenuState extends State {
         scor = preferences.getInteger("scor", 0);
         collidePlayBtn = new Rectangle(MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150, 98, 40);
         collideDualPlayBtn = new Rectangle(MyGame.WIDTH / 2 - dualplaybtn.getWidth() / 2, MyGame.HEIGHT / 2 - 100, 84, 40);
+        font = new BitmapFont(Gdx.files.internal("font.fnt"));
         Gdx.input.setCatchBackKey(false);
     }
 
@@ -95,7 +97,6 @@ public class MenuState extends State {
                 xScor -= 12;
                 aux /= 10;
             }
-            BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
             font.setColor(Color.WHITE);
             font.draw(sb, String.valueOf(scor), xScor, 600);
             boolean nou = preferences.getBoolean("nou", false);

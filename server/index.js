@@ -27,13 +27,13 @@ io.on('connection', function(socket){
     });
     socket.on('playerMoved', function(data) {
         data.id = socket.id;
-        socket.broadcast.emit('playerMoved', data);
         for(var i = 0; i < players.length; ++i) {
             if(players[i].id == data.id) {
                 players[i].x = data.x;
                 players[i].y = data.y;
             }
         }
+        socket.broadcast.emit('playerMoved', data);
     });
 	socket.on('disconnect', function(){
 		console.log("Player Disconnected");

@@ -56,7 +56,6 @@ public class DualPlayState extends State {
         for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
-        ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
         preferences = Gdx.app.getPreferences("highscore");
         //preferences.putBoolean("nou", false).flush();
         Gdx.input.setCatchBackKey(true);
@@ -73,6 +72,7 @@ public class DualPlayState extends State {
             @Override
             public void call(Object... args) {
                 Gdx.app.log("SocketIO", " Connected");
+                ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
             }
         }).on("socketID", new Emitter.Listener() {
             @Override
@@ -136,10 +136,11 @@ public class DualPlayState extends State {
                         String playerId = objects.getJSONObject(i).getString("id");
                         position.x = ((Double) objects.getJSONObject(i).getDouble("x")).floatValue();
                         position.y = ((Double) objects.getJSONObject(i).getDouble("y")).floatValue();
-                        if (playerId != id) {
-                            mingi.put(playerId, new Ball(position.y, position.x));
-                            nume.put(playerId, objects.getJSONObject(i).getString("nume"));
-                        }
+                        //if (playerId != id) {
+                        mingi.put(playerId, new Ball(position.y, position.x));
+                        nume.put(playerId, objects.getJSONObject(i).getString("nume"));
+                        //}
+                        Gdx.app.log(playerId, position.x + "  " + position.y);
                     }
                 } catch (JSONException e) {
 
@@ -177,13 +178,14 @@ public class DualPlayState extends State {
 
     @Override
     protected void handleInput() {
-        if (Gdx.input.justTouched() && poate == true) {
+        if (Gdx.input.justTouched() && poate == true && ball != null) {
             ball.jump();
             poate = false;
             ball.setStopped(false);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.BACK)) {
             gsm.set(new MenuState(gsm));
+            socket.disconnect();
             dispose();
         }
     }
@@ -191,27 +193,30 @@ public class DualPlayState extends State {
     @Override
     public void update(float dt) {
         handleInput();
-        updateServer(dt);
-        ball.update(dt);
-        if (ball.getPozitie().y > cam.position.y + 200)
-            cam.position.y = ball.getPozitie().y - 200;
-        for (Platforma plat : platforme) {
-            if (cam.position.y - cam.viewportHeight / 2 > plat.getPozitie().y + 20) {
-                plat.reposition(plat.getPozitie().y + 120 * numarPlatforme);
+        if (ball != null) {
+            updateServer(dt);
+            ball.update(dt);
+            if (ball.getPozitie().y > cam.position.y + 200)
+                cam.position.y = ball.getPozitie().y - 200;
+            for (Platforma plat : platforme) {
+                if (cam.position.y - cam.viewportHeight / 2 > plat.getPozitie().y + 20) {
+                    plat.reposition(plat.getPozitie().y + 120 * numarPlatforme);
+                }
+                if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y - 5)
+                    ball.jump();
             }
-            if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y - 5)
-                ball.jump();
-        }
-        if (ball.getPozitie().y < cam.position.y - 800) {
-            int scor = preferences.getInteger("scor", 0);
-            int rez = Math.max((int) Math.floor(cam.position.y) - 400, scor);
-            if (rez != scor) {
-                preferences.putBoolean("nou", true);
+            if (ball.getPozitie().y < cam.position.y - 800) {
+                int scor = preferences.getInteger("scor", 0);
+                int rez = Math.max((int) Math.floor(cam.position.y) - 400, scor);
+                if (rez != scor) {
+                    preferences.putBoolean("nou", true);
+                }
+                preferences.putInteger("scor", rez);
+                preferences.flush();
+                gsm.set(new MenuState(gsm));
+                socket.disconnect();
+                dispose();
             }
-            preferences.putInteger("scor", rez);
-            preferences.flush();
-            gsm.set(new MenuState(gsm));
-            dispose();
         }
         cam.update();
     }
@@ -232,8 +237,8 @@ public class DualPlayState extends State {
                     entry.getValue().getPozitie().x - glyphLayout.width / 2,
                     entry.getValue().getPozitie().y + 25);
         }
-
-        sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
+        if (ball != null)
+            sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
         }
