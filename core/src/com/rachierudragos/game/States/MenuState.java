@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.rachierudragos.game.MyGame;
@@ -18,22 +19,29 @@ public class MenuState extends State {
     private Texture background;
     private Texture playbtn;
     private Texture dualplaybtn;
+    private Texture settings;
     private int scor;
     private Preferences preferences;
     private Rectangle collidePlayBtn;
     private Rectangle collideDualPlayBtn;
+    private Circle collideSettings;
     private boolean creez = false;
     private BitmapFont font;
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
+        cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
+        cam.update();
         background = new Texture("bg.png");
         playbtn = new Texture("play.png");
         dualplaybtn = new Texture("dualbutton.png");
+        settings = new Texture("settings.png");
         preferences = Gdx.app.getPreferences("highscore");
         scor = preferences.getInteger("scor", 0);
         collidePlayBtn = new Rectangle(MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150, 98, 40);
         collideDualPlayBtn = new Rectangle(MyGame.WIDTH / 2 - dualplaybtn.getWidth() / 2, MyGame.HEIGHT / 2 - 100, 84, 40);
+        collideSettings = new Circle();
+        collideSettings.set(MyGame.WIDTH - 48, MyGame.HEIGHT - 48, 32);
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
         Gdx.input.setCatchBackKey(false);
     }
@@ -45,12 +53,12 @@ public class MenuState extends State {
             float clickY = Gdx.input.getY();
             Vector3 input = new Vector3(clickX, clickY, 0);
             cam.unproject(input);
-            Gdx.app.log("x :", String.valueOf(input.x));
-            Gdx.app.log("y :", String.valueOf(input.y));
             if (collidePlayBtn.contains(input.x, input.y)) {
+                //Normal
                 gsm.set(new PlayState(gsm));
                 dispose();
             } else if (collideDualPlayBtn.contains(input.x, input.y)) {
+                //Dual
                 if (preferences.getString("nume", "").equals(""))
                     Gdx.input.getTextInput(new Input.TextInputListener() {
                         @Override
@@ -66,7 +74,10 @@ public class MenuState extends State {
                         }
                     }, "Numele jucatorului:", "", "Georgel");
                 else creez = true;
-
+            } else if (collideSettings.contains(input.x, input.y)) {
+                //Settings
+                gsm.set(new SettingsState(gsm));
+                dispose();
             }
         }
         if (creez) {
@@ -83,13 +94,12 @@ public class MenuState extends State {
 
     @Override
     public void render(SpriteBatch sb) {
-        cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
-        cam.update();
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(background, 0, 0, MyGame.WIDTH, MyGame.HEIGHT);
         sb.draw(playbtn, MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150);
         sb.draw(dualplaybtn, MyGame.WIDTH / 2 - dualplaybtn.getWidth() / 2, MyGame.HEIGHT / 2 - 100);
+        sb.draw(settings, MyGame.WIDTH - 80, MyGame.HEIGHT - 80, 64, 64);
         if (scor != 0) {
             int aux = scor;
             int xScor = 230;
@@ -110,6 +120,7 @@ public class MenuState extends State {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.CYAN);
         shapeRenderer.rect(collidePlayBtn.getX(),collidePlayBtn.getY(),collidePlayBtn.width,collidePlayBtn.height);
+        shapeRenderer.circle(collideSettings.x,collideSettings.y,32);
         shapeRenderer.end();
         */
     }

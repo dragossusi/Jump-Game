@@ -29,6 +29,7 @@ public class DreamPlayState extends State {
     private boolean first;
     private boolean activ = false;
     private Timer.Task asd;
+    private float lastOne;
 
     public DreamPlayState(GameStateManager gsm, boolean first) {
         super(gsm);
@@ -43,6 +44,7 @@ public class DreamPlayState extends State {
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
+        lastOne = 120;
         asd = new Timer.Task() {
             @Override
             public void run() {
@@ -81,13 +83,16 @@ public class DreamPlayState extends State {
             if (cam.position.y - cam.viewportHeight / 2 > plat.getPozitie().y + 20) {
                 plat.reposition(plat.getPozitie().y + 120 * numarPlatforme);
             }
-            if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y)
+            if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y) {
                 ball.jump();
+                if (plat.getPozitie().y > lastOne)
+                    lastOne = plat.getPozitie().y;
+            }
         }
         if (ball.getPozitie().y < cam.position.y - 800) {
             if (!activ) {
                 scor = preferences.getInteger("scor", 0);
-                int rez = Math.max((int) Math.floor(cam.position.y) - 400, scor);
+                int rez = Math.max((int) lastOne / 120 - 1, scor);
                 if (rez != scor) {
                     preferences.putBoolean("nou", true);
                 }

@@ -3,7 +3,10 @@ package com.rachierudragos.game.States;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.rachierudragos.game.MyGame;
@@ -21,6 +24,9 @@ public class PlayState extends State {
     private Array<Platforma> platforme;
     private boolean poate = true;
     private Preferences preferences;
+    private BitmapFont font;
+    private GlyphLayout glyphLayout;
+    private float lastOne;
 
     protected PlayState(GameStateManager gsm) {
         super(gsm);
@@ -34,6 +40,10 @@ public class PlayState extends State {
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
         preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
+        font = new BitmapFont(Gdx.files.internal("font.fnt"));
+        glyphLayout = new GlyphLayout(font, String.valueOf(0));
+        font.setColor(Color.CYAN);
+        lastOne = 120;
         Gdx.input.setCatchBackKey(true);
     }
 
@@ -60,12 +70,18 @@ public class PlayState extends State {
             if (cam.position.y - cam.viewportHeight / 2 > plat.getPozitie().y + 20) {
                 plat.reposition(plat.getPozitie().y + 120 * numarPlatforme);
             }
-            if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y)
+            plat.update(dt);
+            if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y) {
                 ball.jump();
+                if (plat.getPozitie().y > lastOne) {
+                    lastOne = plat.getPozitie().y;
+                    glyphLayout.setText(font, String.valueOf((int) lastOne / 120 - 1));
+                }
+            }
         }
         if (ball.getPozitie().y < cam.position.y - 800) {
             int scor = preferences.getInteger("scor", 0);
-            int rez = Math.max((int) Math.floor(cam.position.y) - 400, scor);
+            int rez = Math.max((int) lastOne / 120 - 1, scor);
             if (rez != scor) {
                 preferences.putBoolean("nou", true);
             }
@@ -86,6 +102,7 @@ public class PlayState extends State {
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
         }
+        font.draw(sb, String.valueOf((int) lastOne / 120 - 1), MyGame.WIDTH / 2 - glyphLayout.width / 2, cam.position.y + 350);
         sb.end();
         /*collides
         shapeRenderer = new ShapeRenderer();

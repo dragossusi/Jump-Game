@@ -3,6 +3,7 @@ package com.rachierudragos.game.States;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -43,11 +44,16 @@ public class DualPlayState extends State {
     private Preferences preferences;
     private Socket socket;
     private BitmapFont font;
+    private BitmapFont font2;
     private GlyphLayout glyphLayout;
+    private GlyphLayout glyphLayout2;
+    private float lastOne;
+    //private ShapeRenderer shapeRenderer;
 
     protected DualPlayState(GameStateManager gsm) {
         super(gsm);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
+        cam.update();
         bg = new Texture("oras.jpg");
         ballTexture = new Texture("rsz_ball.png");
         dualball = new Texture("dualball.png");
@@ -62,9 +68,16 @@ public class DualPlayState extends State {
         mingi = new HashMap<String, Ball>();
         nume = new HashMap<String, String>();
         font = new BitmapFont(Gdx.files.internal("fontsmaller.fnt"));
+        font.setColor(Color.WHITE);
+        font2 = new BitmapFont(Gdx.files.internal("font.fnt"));
+        font2.setColor(Color.CYAN);
         glyphLayout = new GlyphLayout();
+        glyphLayout2 = glyphLayout;
+        lastOne = 120;
+        glyphLayout2.setText(font, String.valueOf(0));
         connectSocket();
         configSocketEvents();
+        //shapeRenderer = new ShapeRenderer();
     }
 
     public void configSocketEvents() {
@@ -202,12 +215,18 @@ public class DualPlayState extends State {
                 if (cam.position.y - cam.viewportHeight / 2 > plat.getPozitie().y + 20) {
                     plat.reposition(plat.getPozitie().y + 120 * numarPlatforme);
                 }
-                if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y - 5)
+                plat.update(dt);
+                if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y - 5) {
                     ball.jump();
+                    if (plat.getPozitie().y > lastOne) {
+                        lastOne = plat.getPozitie().y;
+                        glyphLayout2.setText(font, String.valueOf(lastOne / 120 - 1));
+                    }
+                }
             }
             if (ball.getPozitie().y < cam.position.y - 800) {
                 int scor = preferences.getInteger("scor", 0);
-                int rez = Math.max((int) Math.floor(cam.position.y) - 400, scor);
+                int rez = Math.max((int) lastOne / 120 - 1, scor);
                 if (rez != scor) {
                     preferences.putBoolean("nou", true);
                 }
@@ -234,7 +253,7 @@ public class DualPlayState extends State {
             glyphLayout.setText(font, nume.get(entry.getKey()));
             font.draw(sb,
                     nume.get(entry.getKey()),
-                    entry.getValue().getPozitie().x - glyphLayout.width / 2,
+                    entry.getValue().getPozitie().x - glyphLayout.width / 2 + 75 / 2,
                     entry.getValue().getPozitie().y + 25);
         }
         if (ball != null)
@@ -242,13 +261,25 @@ public class DualPlayState extends State {
         for (Platforma plat : platforme) {
             sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
         }
+        font2.draw(sb, String.valueOf((int) lastOne / 120 - 1), MyGame.WIDTH / 2 - glyphLayout.width / 2, cam.position.y + 350);
         sb.end();
+        /*
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.CYAN);
+        for (Platforma plat : platforme) {
+            shapeRenderer.rect(plat.getRectangle().x, plat.getRectangle().y, 100, 20);
+        }
+        shapeRenderer.end();
+        */
     }
 
     @Override
     public void dispose() {
         bg.dispose();
         ballTexture.dispose();
+        font.dispose();
+        font2.dispose();
         for (Platforma plat : platforme) {
             plat.getPlatforma().dispose();
         }
