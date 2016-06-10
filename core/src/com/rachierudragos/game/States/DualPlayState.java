@@ -35,11 +35,12 @@ public class DualPlayState extends State {
     private String id;
     private HashMap<String, Ball> mingi;
     private HashMap<String, String> nume;
+    private HashMap<String, String> skinuri;
+    private HashMap<String, Texture> texturi;
     private Ball ball;
     private Array<Platforma> platforme;
     private Texture bg;
     private Texture ballTexture;
-    private Texture dualball;
     private boolean poate = true;
     private Preferences preferences;
     private Socket socket;
@@ -55,17 +56,21 @@ public class DualPlayState extends State {
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         cam.update();
         preferences = Gdx.app.getPreferences("highscore");
+        mingi = new HashMap<String, Ball>();
+        nume = new HashMap<String, String>();
+        skinuri = new HashMap<String, String>();
+        texturi = new HashMap<String, Texture>();
         bg = new Texture("oras.jpg");
         ballTexture = new Texture(preferences.getString("skin"));
-        dualball = new Texture("dualball.png");
         platforme = new Array<Platforma>();
         for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
         //preferences.putBoolean("nou", false).flush();
+        for (int i = 0; i < SettingsState.numeMingi.length; ++i) {
+            texturi.put(SettingsState.numeMingi[i], new Texture(SettingsState.numeMingi[i]));
+        }
         Gdx.input.setCatchBackKey(true);
-        mingi = new HashMap<String, Ball>();
-        nume = new HashMap<String, String>();
         font = new BitmapFont(Gdx.files.internal("fontsmaller.fnt"));
         font.setColor(Color.WHITE);
         font2 = new BitmapFont(Gdx.files.internal("font.fnt"));
@@ -104,9 +109,11 @@ public class DualPlayState extends State {
                 try {
                     String playerId = data.getString("id");
                     String name = data.getString("name");
+                    String skin = data.getString("skin");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
                     mingi.put(playerId, new Ball(ball.getPozitie().x, ball.getPozitie().y));
                     nume.put(playerId, name);
+                    skinuri.put(playerId, skin);
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
@@ -148,10 +155,9 @@ public class DualPlayState extends State {
                         String playerId = objects.getJSONObject(i).getString("id");
                         position.x = ((Double) objects.getJSONObject(i).getDouble("x")).floatValue();
                         position.y = ((Double) objects.getJSONObject(i).getDouble("y")).floatValue();
-                        //if (playerId != id) {
                         mingi.put(playerId, new Ball(position.y, position.x));
                         nume.put(playerId, objects.getJSONObject(i).getString("nume"));
-                        //}
+                        skinuri.put(playerId, objects.getJSONObject(i).getString("skin"));
                         Gdx.app.log("pozitie", position.x + "  " + position.y);
                     }
                 } catch (JSONException e) {
@@ -177,8 +183,8 @@ public class DualPlayState extends State {
 
     private void connectSocket() {
         try {
-            //socket = IO.socket("http://habarnuam-64071.onmodulus.net:80");
-            socket = IO.socket("http://localhost:8080");
+            socket = IO.socket("http://habarnuam-64071.onmodulus.net:80");
+            //socket = IO.socket("http://localhost:8080");
             socket.connect();
             JSONObject data = new JSONObject();
             data.put("nume", preferences.getString("nume", ""));
@@ -249,7 +255,9 @@ public class DualPlayState extends State {
         //mingile
 
         for (Map.Entry<String, Ball> entry : mingi.entrySet()) {
-            sb.draw(dualball, entry.getValue().getPozitie().x, entry.getValue().getPozitie().y);
+            sb.draw(texturi.get(skinuri.get(entry.getKey())),
+                    entry.getValue().getPozitie().x,
+                    entry.getValue().getPozitie().y);
             glyphLayout.setText(font, nume.get(entry.getKey()));
             font.draw(sb,
                     nume.get(entry.getKey()),
@@ -282,6 +290,9 @@ public class DualPlayState extends State {
         font2.dispose();
         for (Platforma plat : platforme) {
             plat.getPlatforma().dispose();
+        }
+        for (int i = 0; i < SettingsState.numeMingi.length; ++i) {
+            texturi.get(SettingsState.numeMingi[i]).dispose();
         }
     }
 }

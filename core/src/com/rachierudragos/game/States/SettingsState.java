@@ -15,6 +15,7 @@ import java.util.HashMap;
  * Created by Dragos on 10.06.2016.
  */
 public class SettingsState extends State {
+    public static final String[] numeMingi = {"rsz_ball.png", "rsz_blue.png", "rsz_green.png", "rsz_doge.png", "rsz_bf.png"};
     private static final int POZITIE_MINGI = 325;
     private Texture background;
     private Texture nume;
@@ -23,7 +24,6 @@ public class SettingsState extends State {
     private Preferences preferences;
     private HashMap<String, Texture> mingi;
     private HashMap<String, Float> pozitii;
-    private String[] numeMingi = {"rsz_ball.png", "rsz_doge.png", "rsz_bf.png"};
     private int activ;
 
     protected SettingsState(GameStateManager gsm) {
@@ -114,6 +114,10 @@ public class SettingsState extends State {
     @Override
     public void dispose() {
         background.dispose();
+        nume.dispose();
+        for (int i = 0; i < numeMingi.length; ++i) {
+            mingi.get(numeMingi[i]).dispose();
+        }
     }
 
     public int find(String[] array, String value) {
