@@ -30,11 +30,16 @@ public class DreamPlayState extends State {
     private boolean activ = false;
     private Timer.Task asd;
     private float lastOne;
+    private BitmapFont font;
 
     public DreamPlayState(GameStateManager gsm, boolean first) {
         super(gsm);
         this.first = first;
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
+        //font
+        font = new BitmapFont(Gdx.files.internal("font.fnt"));
+        font.setColor(Color.WHITE);
+        //texturi
         bg = new Texture("oras.jpg");
         ballTexture = new Texture("rsz_ball.png");
         platforme = new Array<Platforma>();
@@ -144,14 +149,11 @@ public class DreamPlayState extends State {
                     xScor -= 12;
                     aux /= 10;
                 }
-                aux = (int) Math.floor(cam.position.y) - 400;
-                font.draw(sb, String.valueOf(aux), xScor, cam.position.y + 200);
+                font.draw(sb, String.valueOf(lastOne / 120 - 1), xScor, cam.position.y + 200);
                 boolean nou = preferences.getBoolean("nou", false);
                 if (nou)
                     font.draw(sb, "New highscore!", 80, cam.position.y + 300);
             }
-            BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
-            font.setColor(Color.WHITE);
             font.draw(sb, String.valueOf(pauza), 230, cam.position.y + 100);
         }
         sb.end();
@@ -164,5 +166,6 @@ public class DreamPlayState extends State {
         for (Platforma plat : platforme) {
             plat.getPlatforma().dispose();
         }
+        font.dispose();
     }
 }

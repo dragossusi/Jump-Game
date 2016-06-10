@@ -54,15 +54,14 @@ public class DualPlayState extends State {
         super(gsm);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         cam.update();
+        preferences = Gdx.app.getPreferences("highscore");
         bg = new Texture("oras.jpg");
-        ballTexture = new Texture("rsz_ball.png");
+        ballTexture = new Texture(preferences.getString("skin"));
         dualball = new Texture("dualball.png");
         platforme = new Array<Platforma>();
-        //platforme.add(new Platforma(120, 200));
         for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
-        preferences = Gdx.app.getPreferences("highscore");
         //preferences.putBoolean("nou", false).flush();
         Gdx.input.setCatchBackKey(true);
         mingi = new HashMap<String, Ball>();
@@ -178,11 +177,12 @@ public class DualPlayState extends State {
 
     private void connectSocket() {
         try {
-            socket = IO.socket("http://habarnuam-64071.onmodulus.net:80");
-            //socket = IO.socket("http://localhost:8080");
+            //socket = IO.socket("http://habarnuam-64071.onmodulus.net:80");
+            socket = IO.socket("http://localhost:8080");
             socket.connect();
             JSONObject data = new JSONObject();
             data.put("nume", preferences.getString("nume", ""));
+            data.put("skin", preferences.getString("skin", "rsz_ball.png"));
             socket.emit("setName", data);
         } catch (Exception e) {
             System.out.println(e);

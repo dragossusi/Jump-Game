@@ -3,6 +3,7 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var players = [];
 var nume;
+var skin;
 server.listen(8080, function(){
 	console.log("Server is now running...");
 });
@@ -13,9 +14,11 @@ io.on('connection', function(socket){
         for(var i = 0; i < players.length; ++i) {
             if(players[i].id == socket.id) {
                 players[i].nume = data.nume;
+                players[i].skin = data.skin;
             }
         }
-        socket.broadcast.emit('newPlayer', { id: socket.id , name: data.nume});
+        console.log(data.nume+" "+data.skin);
+        socket.broadcast.emit('newPlayer', { id: socket.id , name: data.nume, skin: data.skin});
     });
     socket.on('playerMoved', function(data) {
         data.id = socket.id;
@@ -39,9 +42,10 @@ io.on('connection', function(socket){
 	});
     players.push(new player(socket.id, nume, 0, 0));
 });
-function player(id, x, y){
+function player(id, nume, x, y){
  	this.id = id;
  	this.nume = nume;
+ 	this.skin = skin;
  	this.x = x;
  	this.y = y;
  }

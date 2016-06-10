@@ -31,14 +31,14 @@ public class PlayState extends State {
     protected PlayState(GameStateManager gsm) {
         super(gsm);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
+        preferences = Gdx.app.getPreferences("highscore");
         bg = new Texture("oras.jpg");
-        ballTexture = new Texture("rsz_ball.png");
+        ballTexture = new Texture(preferences.getString("skin"));
         platforme = new Array<Platforma>();
         for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
         ball = new Ball((int) platforme.get(0).getPozitie().x, 140);
-        preferences = Gdx.app.getPreferences("highscore");
         preferences.putBoolean("nou", false).flush();
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
         glyphLayout = new GlyphLayout(font, String.valueOf(0));

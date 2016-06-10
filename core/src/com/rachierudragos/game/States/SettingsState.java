@@ -22,8 +22,9 @@ public class SettingsState extends State {
     private Rectangle collideMingi;
     private Preferences preferences;
     private HashMap<String, Texture> mingi;
-    private HashMap<String, Vector3> pozitii;
+    private HashMap<String, Float> pozitii;
     private String[] numeMingi = {"rsz_ball.png", "rsz_doge.png", "rsz_bf.png"};
+    private int activ;
 
     protected SettingsState(GameStateManager gsm) {
         super(gsm);
@@ -38,12 +39,12 @@ public class SettingsState extends State {
         collideMingi = new Rectangle(0, POZITIE_MINGI, MyGame.WIDTH, POZITIE_MINGI + 75);
         //mingile si pozitiile
         mingi = new HashMap<String, Texture>();
-        pozitii = new HashMap<String, Vector3>();
+        pozitii = new HashMap<String, Float>();
+        activ = find(numeMingi, preferences.getString("skin", "rsz_ball.png"));
         for (int i = 0; i < numeMingi.length; ++i) {
             mingi.put(numeMingi[i],
                     new Texture(numeMingi[i]));
-            pozitii.put(numeMingi[i],
-                    new Vector3(MyGame.WIDTH / 2 - 75 / 2 + 150 * i, POZITIE_MINGI, 0));
+            pozitii.put(numeMingi[i], (float) (MyGame.WIDTH / 2 - 75 / 2 + 150 * (i - activ)));
         }
     }
 
@@ -68,7 +69,23 @@ public class SettingsState extends State {
                     }
                 }, "Numele jucatorului:", "", preferences.getString("nume", "Georgel"));
             } else if (collideMingi.contains(input.x, input.y)) {
-
+                if (input.x > MyGame.WIDTH / 2 + 150 - 75 / 2
+                        && pozitii.get(numeMingi[numeMingi.length - 1]) != MyGame.WIDTH / 2 - 75 / 2) {
+                    //schimba spre stanga
+                    for (int i = 0; i < numeMingi.length; ++i) {
+                        pozitii.put(numeMingi[i], pozitii.get(numeMingi[i]) - 150);
+                    }
+                    ++activ;
+                    preferences.putString("skin", numeMingi[activ]).flush();
+                } else if (input.x < MyGame.WIDTH / 2 - 150 + 75 / 2
+                        && pozitii.get(numeMingi[0]) != MyGame.WIDTH / 2 - 75 / 2) {
+                    //schimba spre dreapta
+                    for (int i = 0; i < numeMingi.length; ++i) {
+                        pozitii.put(numeMingi[i], pozitii.get(numeMingi[i]) + 150);
+                    }
+                    --activ;
+                    preferences.putString("skin", numeMingi[activ]).flush();
+                }
             }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.BACK)) {
@@ -89,7 +106,7 @@ public class SettingsState extends State {
         sb.draw(background, 0, 0, MyGame.WIDTH, MyGame.HEIGHT);
         sb.draw(nume, MyGame.WIDTH / 2 - nume.getWidth() / 2, 100);
         for (int i = 0; i < numeMingi.length; ++i) {
-            sb.draw(mingi.get(numeMingi[i]), pozitii.get(numeMingi[i]).x, pozitii.get(numeMingi[i]).y);
+            sb.draw(mingi.get(numeMingi[i]), pozitii.get(numeMingi[i]), POZITIE_MINGI);
         }
         sb.end();
     }
