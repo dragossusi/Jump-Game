@@ -36,14 +36,20 @@ public class Ball {
                 viteza.add(0, GRAVITY, 0);
             viteza.scl(dt);
             pozitie.add(0, viteza.y, 0);
-                float acceleration = Gdx.input.getAccelerometerX();
-                if (Math.abs(acceleration) > 0.3f) {
-                    pozitie.x -= acceleration * 100 * dt;
-                }
-                if (pozitie.x > 480)
-                    pozitie.x -= 480;
-                else if (pozitie.x < 0)
-                    pozitie.x += 480;
+            switch (Gdx.app.getType()) {
+                case Android:
+                    float acceleration = Gdx.input.getAccelerometerX();
+                    if (Math.abs(acceleration) > 0.3f) {
+                        pozitie.x -= acceleration * 100 * dt;
+                    }
+                    if (pozitie.x > 480)
+                        pozitie.x -= 480;
+                    else if (pozitie.x < 0)
+                        pozitie.x += 480;
+                    break;
+                case Desktop:
+                    pozitie.x = Gdx.input.getX() - 75 / 2;
+            }
 
             viteza.scl(1 / dt);
         }

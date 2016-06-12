@@ -40,6 +40,9 @@ public class DualPlayState extends State {
     private Ball ball;
     private Array<Platforma> platforme;
     private Texture bg;
+    private Texture Plat;
+    private Texture cloudPlat;
+    private Texture mdPlat;
     private Texture ballTexture;
     private boolean poate = true;
     private Preferences preferences;
@@ -61,14 +64,17 @@ public class DualPlayState extends State {
         skinuri = new HashMap<String, String>();
         texturi = new HashMap<String, Texture>();
         bg = new Texture("oras.jpg");
-        ballTexture = new Texture(preferences.getString("skin"));
+        Plat = new Texture("plat.png");
+        cloudPlat = new Texture("cloudplat.png");
+        mdPlat = new Texture("platmovedes.png");
+        ballTexture = new Texture(preferences.getString("skin", "rsz_ball.png"));
         platforme = new Array<Platforma>();
         for (int i = 1; i <= numarPlatforme; ++i) {
             platforme.add(new Platforma(i * 120));
         }
         //preferences.putBoolean("nou", false).flush();
         for (int i = 0; i < SettingsState.numeMingi.length; ++i) {
-            texturi.put(SettingsState.numeMingi[i], new Texture(SettingsState.numeMingi[i]));
+            texturi.put("rsz_" + SettingsState.numeMingi[i] + ".png", new Texture("rsz_" + SettingsState.numeMingi[i] + ".png"));
         }
         Gdx.input.setCatchBackKey(true);
         font = new BitmapFont(Gdx.files.internal("fontsmaller.fnt"));
@@ -223,10 +229,15 @@ public class DualPlayState extends State {
                 }
                 plat.update(dt);
                 if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y - 5) {
-                    ball.jump();
-                    if (plat.getPozitie().y > lastOne) {
-                        lastOne = plat.getPozitie().y;
-                        glyphLayout2.setText(font, String.valueOf(lastOne / 120 - 1));
+                    if (plat.isDestroyed() == false) {
+                        ball.jump();
+                        if (plat.getType() != Platforma.MOVING) {
+                            plat.setDestroyed(true);
+                        }
+                        if (plat.getPozitie().y > lastOne) {
+                            lastOne = plat.getPozitie().y;
+                            glyphLayout2.setText(font, String.valueOf(lastOne / 120 - 1));
+                        }
                     }
                 }
             }
@@ -267,7 +278,19 @@ public class DualPlayState extends State {
         if (ball != null)
             sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         for (Platforma plat : platforme) {
-            sb.draw(plat.getPlatforma(), plat.getPozitie().x, plat.getPozitie().y, 100, 20);
+            if (plat.isDestroyed() == false) {
+                switch (plat.getType()) {
+                    case Platforma.MOVING:
+                        sb.draw(Plat, plat.getPozitie().x, plat.getPozitie().y, 100, 20);
+                        break;
+                    case Platforma.DESTROY:
+                        sb.draw(cloudPlat, plat.getPozitie().x, plat.getPozitie().y, 100, 20);
+                        break;
+                    case Platforma.MOVEDESTROY:
+                        sb.draw(mdPlat, plat.getPozitie().x, plat.getPozitie().y, 100, 20);
+                        break;
+                }
+            }
         }
         font2.draw(sb, String.valueOf((int) lastOne / 120 - 1), MyGame.WIDTH / 2 - glyphLayout.width / 2, cam.position.y + 350);
         sb.end();
@@ -288,11 +311,11 @@ public class DualPlayState extends State {
         ballTexture.dispose();
         font.dispose();
         font2.dispose();
-        for (Platforma plat : platforme) {
-            plat.getPlatforma().dispose();
-        }
+        Plat.dispose();
+        cloudPlat.dispose();
+        mdPlat.dispose();
         for (int i = 0; i < SettingsState.numeMingi.length; ++i) {
-            texturi.get(SettingsState.numeMingi[i]).dispose();
+            texturi.get("rsz_" + SettingsState.numeMingi[i] + ".png").dispose();
         }
     }
 }

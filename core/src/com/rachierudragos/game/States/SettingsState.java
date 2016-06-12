@@ -15,7 +15,7 @@ import java.util.HashMap;
  * Created by Dragos on 10.06.2016.
  */
 public class SettingsState extends State {
-    public static final String[] numeMingi = {"rsz_ball.png", "rsz_blue.png", "rsz_green.png", "rsz_doge.png", "rsz_bf.png"};
+    public static final String[] numeMingi = {"ball", "blue", "green", "doge", "jake", "nazi", "derp", "bf", "butthead", "sir", "lenny", "yara", "yara2", "crazy", "mad", "pokerface", "romania", "siria"};
     private static final int POZITIE_MINGI = 325;
     private Texture background;
     private Texture nume;
@@ -43,7 +43,7 @@ public class SettingsState extends State {
         activ = find(numeMingi, preferences.getString("skin", "rsz_ball.png"));
         for (int i = 0; i < numeMingi.length; ++i) {
             mingi.put(numeMingi[i],
-                    new Texture(numeMingi[i]));
+                    new Texture("rsz_" + numeMingi[i] + ".png"));
             pozitii.put(numeMingi[i], (float) (MyGame.WIDTH / 2 - 75 / 2 + 150 * (i - activ)));
         }
     }
@@ -76,7 +76,7 @@ public class SettingsState extends State {
                         pozitii.put(numeMingi[i], pozitii.get(numeMingi[i]) - 150);
                     }
                     ++activ;
-                    preferences.putString("skin", numeMingi[activ]).flush();
+                    preferences.putString("skin", "rsz_" + numeMingi[activ] + ".png").flush();
                 } else if (input.x < MyGame.WIDTH / 2 - 150 + 75 / 2
                         && pozitii.get(numeMingi[0]) != MyGame.WIDTH / 2 - 75 / 2) {
                     //schimba spre dreapta
@@ -84,7 +84,7 @@ public class SettingsState extends State {
                         pozitii.put(numeMingi[i], pozitii.get(numeMingi[i]) + 150);
                     }
                     --activ;
-                    preferences.putString("skin", numeMingi[activ]).flush();
+                    preferences.putString("skin", "rsz_" + numeMingi[activ] + ".png").flush();
                 }
             }
         }
@@ -124,7 +124,7 @@ public class SettingsState extends State {
         for (int i = 0; i < array.length; i++)
             if (array[i].equals(value))
                 return i;
-        return -1;
+        return 0;
     }
 
 }
