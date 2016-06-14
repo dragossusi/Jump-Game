@@ -18,6 +18,7 @@ public class Platforma {
     private boolean stopped;
     private boolean destroyed;
     private int type;
+    private int timer = 0;
 
     public Platforma(float y) {
         rand = new Random();
@@ -48,6 +49,13 @@ public class Platforma {
                 viteza = -viteza;
             }
         }
+        if (destroyed == true) {
+            if (timer <= 0) {
+                destroyed = false;
+            } else {
+                timer -= dt;
+            }
+        }
         collision.setPosition(pozitie.x, pozitie.y);
     }
 
@@ -55,8 +63,9 @@ public class Platforma {
         return destroyed;
     }
 
-    public void setDestroyed(boolean destroyed) {
-        this.destroyed = destroyed;
+    public void setDestroyed() {
+        destroyed = true;
+        timer = 180;
     }
 
     public void reposition(float y) {
@@ -66,13 +75,18 @@ public class Platforma {
         if (y > 25 * 120 && y <= 50 * 120)
             setType(MOVING);
         else if (y > 50 * 120 && y <= 75 * 120) {
-            setType(DESTROY);
+            int x = rand.nextInt(10);
+            if (x <= 4) setType(MOVING);
+            else setType(DESTROY);
         } else if (y > 75 * 120 && y <= 100 * 120) {
-            setType(MOVEDESTROY);
+            int x = rand.nextInt(10);
+            if (x <= 3) setType(MOVING);
+            else if (x <= 6) setType(DESTROY);
+            else setType(MOVEDESTROY);
         } else if (y > 100 * 120) {
-            int x = rand.nextInt(100);
-            if (x < 20) setType(MOVING);
-            else if (x < 50) setType(DESTROY);
+            int x = rand.nextInt(11);
+            if (x <= 1) setType(MOVING);
+            else if (x <= 4) setType(DESTROY);
             else setType(MOVEDESTROY);
         }
     }

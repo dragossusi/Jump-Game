@@ -96,6 +96,8 @@ public class DreamPlayState extends State {
             }
             if (plat.collides(ball) && ball.getViteza().y < 0 && ball.getPozitie().y > plat.getPozitie().y) {
                 ball.jump();
+                if (plat.getType() != Platforma.MOVING)
+                    plat.setDestroyed();
                 if (plat.getPozitie().y > lastOne)
                     lastOne = plat.getPozitie().y;
             }

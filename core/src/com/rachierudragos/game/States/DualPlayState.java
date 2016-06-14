@@ -30,7 +30,7 @@ import io.socket.emitter.Emitter;
  */
 public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
-    private static final float UPDATE_TIME = 1 / 120f;
+    private static final float UPDATE_TIME = (float) 1 / 10;
     private float timer;
     private String id;
     private HashMap<String, Ball> mingi;
@@ -119,7 +119,10 @@ public class DualPlayState extends State {
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
                     mingi.put(playerId, new Ball(ball.getPozitie().x, ball.getPozitie().y));
                     nume.put(playerId, name);
-                    skinuri.put(playerId, skin);
+                    if (find(SettingsState.numeMingi, skin) != -1)
+                        skinuri.put(playerId, skin);
+                    else
+                        skinuri.put(playerId, "rsz_ball.png");
                 } catch (JSONException e) {
                     Gdx.app.log("SocketIO", "Error getting New PlayerID");
                 }
@@ -232,7 +235,7 @@ public class DualPlayState extends State {
                     if (plat.isDestroyed() == false) {
                         ball.jump();
                         if (plat.getType() != Platforma.MOVING) {
-                            plat.setDestroyed(true);
+                            plat.setDestroyed();
                         }
                         if (plat.getPozitie().y > lastOne) {
                             lastOne = plat.getPozitie().y;
@@ -317,5 +320,12 @@ public class DualPlayState extends State {
         for (int i = 0; i < SettingsState.numeMingi.length; ++i) {
             texturi.get("rsz_" + SettingsState.numeMingi[i] + ".png").dispose();
         }
+    }
+
+    public int find(String[] array, String value) {
+        for (int i = 0; i < array.length; i++)
+            if (("rsz_" + array[i] + ".png").equals(value))
+                return i;
+        return -1;
     }
 }

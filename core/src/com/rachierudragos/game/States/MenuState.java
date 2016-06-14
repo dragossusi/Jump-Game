@@ -32,7 +32,7 @@ public class MenuState extends State {
         super(gsm);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
         cam.update();
-        background = new Texture("bg.png");
+        background = new Texture("bg2.jpg");
         playbtn = new Texture("play.png");
         dualplaybtn = new Texture("dualbutton.png");
         settings = new Texture("settings.png");
@@ -41,7 +41,7 @@ public class MenuState extends State {
         collidePlayBtn = new Rectangle(MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150, 98, 40);
         collideDualPlayBtn = new Rectangle(MyGame.WIDTH / 2 - dualplaybtn.getWidth() / 2, MyGame.HEIGHT / 2 - 100, 84, 40);
         collideSettings = new Circle();
-        collideSettings.set(MyGame.WIDTH - 48, MyGame.HEIGHT - 48, 32);
+        collideSettings.set(MyGame.WIDTH - 40, MyGame.HEIGHT - 40, 24);
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
         Gdx.input.setCatchBackKey(false);
     }
@@ -99,7 +99,7 @@ public class MenuState extends State {
         sb.draw(background, 0, 0, MyGame.WIDTH, MyGame.HEIGHT);
         sb.draw(playbtn, MyGame.WIDTH / 2 - playbtn.getWidth() / 2, MyGame.HEIGHT / 2 - 150);
         sb.draw(dualplaybtn, MyGame.WIDTH / 2 - dualplaybtn.getWidth() / 2, MyGame.HEIGHT / 2 - 100);
-        sb.draw(settings, MyGame.WIDTH - 80, MyGame.HEIGHT - 80, 64, 64);
+        sb.draw(settings, MyGame.WIDTH - 64, MyGame.HEIGHT - 64, 48, 48);
         if (scor != 0) {
             int aux = scor;
             int xScor = 230;
@@ -119,8 +119,7 @@ public class MenuState extends State {
         shapeRenderer.setProjectionMatrix(cam.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.CYAN);
-        shapeRenderer.rect(collidePlayBtn.getX(),collidePlayBtn.getY(),collidePlayBtn.width,collidePlayBtn.height);
-        shapeRenderer.circle(collideSettings.x,collideSettings.y,32);
+        shapeRenderer.circle(collideSettings.x,collideSettings.y,24);
         shapeRenderer.end();
         */
     }

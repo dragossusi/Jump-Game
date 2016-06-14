@@ -81,7 +81,7 @@ public class PlayState extends State {
                 if (plat.isDestroyed() == false) {
                     ball.jump();
                     if (plat.getType() != Platforma.MOVING)
-                        plat.setDestroyed(true);
+                        plat.setDestroyed();
                     if (plat.getPozitie().y > lastOne) {
                         lastOne = plat.getPozitie().y;
                         glyphLayout.setText(font, String.valueOf((int) lastOne / 120 - 1));
