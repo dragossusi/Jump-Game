@@ -1,6 +1,7 @@
 package com.rachierudragos.game.sprites;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector3;
 
@@ -40,15 +41,18 @@ public class Ball {
                 case Android:
                     float acceleration = Gdx.input.getAccelerometerX();
                     if (Math.abs(acceleration) > 0.3f) {
-                        pozitie.x -= acceleration * 100 * dt;
+                        pozitie.x -= acceleration * 110 * dt;
+                        checkPosition();
                     }
-                    if (pozitie.x > 480)
-                        pozitie.x -= 480;
-                    else if (pozitie.x < 0)
-                        pozitie.x += 480;
                     break;
                 case Desktop:
-                    pozitie.x = Gdx.input.getX() - 75 / 2;
+                    if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                        pozitie.x -= 400 * dt;
+                        checkPosition();
+                    } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                        pozitie.x += 400 * dt;
+                        checkPosition();
+                    }
             }
 
             viteza.scl(1 / dt);
@@ -71,5 +75,12 @@ public class Ball {
 
     public Circle getAaa() {
         return aaa;
+    }
+
+    private void checkPosition() {
+        if (pozitie.x > 480)
+            pozitie.x -= 555;
+        else if (pozitie.x < -75)
+            pozitie.x += 555;
     }
 }

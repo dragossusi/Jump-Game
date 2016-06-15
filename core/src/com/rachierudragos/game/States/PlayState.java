@@ -70,8 +70,8 @@ public class PlayState extends State {
     public void update(float dt) {
         handleInput();
         ball.update(dt);
-        if (ball.getPozitie().y > cam.position.y + 200)
-            cam.position.y = ball.getPozitie().y - 200;
+        if (ball.getPozitie().y > cam.position.y + 100)
+            cam.position.y = ball.getPozitie().y - 100;
         for (Platforma plat : platforme) {
             if (cam.position.y - cam.viewportHeight / 2 > plat.getPozitie().y + 20) {
                 plat.reposition(plat.getPozitie().y + 120 * numarPlatforme);
@@ -108,7 +108,6 @@ public class PlayState extends State {
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);
-        sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         for (Platforma plat : platforme) {
             if (plat.isDestroyed() == false) {
                 switch (plat.getType()) {
@@ -124,6 +123,7 @@ public class PlayState extends State {
                 }
             }
         }
+        sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         font.draw(sb, String.valueOf((int) lastOne / 120 - 1), MyGame.WIDTH / 2 - glyphLayout.width / 2, cam.position.y + 350);
         sb.end();
         /*collides
