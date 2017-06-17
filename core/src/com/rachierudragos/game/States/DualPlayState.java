@@ -60,7 +60,7 @@ public class DualPlayState extends State {
     private GlyphLayout glyphLayout;
     private GlyphLayout glyphLayout2;
     private float lastOne;
-    private float nextSponge = 10 * 120;
+    private float nextSponge = 40 * 120;
     //private ShapeRenderer shapeRenderer;
 
     protected DualPlayState(GameStateManager gsm) {
@@ -205,7 +205,7 @@ public class DualPlayState extends State {
 
     private void connectSocket() {
         try {
-            socket = IO.socket("http://habarnuam-64071.onmodulus.net:80");
+            socket = IO.socket("https://arcane-island-35712.herokuapp.com");
             //socket = IO.socket("http://localhost:8080");
             socket.connect();
             JSONObject data = new JSONObject();

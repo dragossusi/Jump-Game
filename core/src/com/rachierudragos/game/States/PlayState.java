@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.rachierudragos.game.MyGame;
 import com.rachierudragos.game.sprites.Ball;
@@ -30,7 +31,7 @@ public class PlayState extends State {
     private BitmapFont font;
     private GlyphLayout glyphLayout;
     private float lastOne;
-
+    private ShapeRenderer shapeRenderer;
     protected PlayState(GameStateManager gsm) {
         super(gsm);
         cam.setToOrtho(false, MyGame.WIDTH, MyGame.HEIGHT);
@@ -51,6 +52,8 @@ public class PlayState extends State {
         font.setColor(Color.CYAN);
         lastOne = 120;
         Gdx.input.setCatchBackKey(true);
+
+        shapeRenderer = new ShapeRenderer();
     }
 
     @Override
@@ -126,8 +129,7 @@ public class PlayState extends State {
         sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         font.draw(sb, String.valueOf((int) lastOne / 120 - 1), MyGame.WIDTH / 2 - glyphLayout.width / 2, cam.position.y + 350);
         sb.end();
-        /*collides
-        shapeRenderer = new ShapeRenderer();
+        /*collides*/
         shapeRenderer.setProjectionMatrix(cam.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.CYAN);
@@ -137,7 +139,7 @@ public class PlayState extends State {
             shapeRenderer.rect(plat.getRectangle().x, plat.getRectangle().y, 100, 20);
         }
         shapeRenderer.end();
-        */
+        /**/
     }
 
     @Override
@@ -148,5 +150,6 @@ public class PlayState extends State {
         cloudPlat.dispose();
         mdPlat.dispose();
         font.dispose();
+        shapeRenderer.dispose();
     }
 }

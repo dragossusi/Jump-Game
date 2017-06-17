@@ -11,7 +11,7 @@ import com.rachierudragos.game.States.MenuState;
 public class MyGame extends ApplicationAdapter {
     public static final int WIDTH = 480;
     public static final int HEIGHT = 800;
-    public static final String TITLE = "Gioace";
+    public static final String TITLE = "Jump";
     private Preferences preferences;
     private GameStateManager gsm;
     private SpriteBatch batch;
