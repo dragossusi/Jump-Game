@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.rachierudragos.game.MyGame;
 import com.rachierudragos.game.sprites.Ball;
+import com.rachierudragos.game.sprites.DualBall;
 import com.rachierudragos.game.sprites.Platforma;
 import com.rachierudragos.game.sprites.SpongeBob;
 
@@ -36,7 +37,7 @@ public class DualPlayState extends State {
     private static final float UPDATE_TIME = (float) 1 / 10;
     private float timer;
     private String id;
-    private HashMap<String, Ball> mingi;
+    private HashMap<String, DualBall> mingi;
     private HashMap<String, String> nume;
     private HashMap<String, String> skinuri;
     private HashMap<String, Texture> texturi;
@@ -69,7 +70,7 @@ public class DualPlayState extends State {
         cam.update();
         preferences = Gdx.app.getPreferences("highscore");
         rand = new Random();
-        mingi = new HashMap<String, Ball>();
+        mingi = new HashMap<String, DualBall>();
         nume = new HashMap<String, String>();
         skinuri = new HashMap<String, String>();
         texturi = new HashMap<String, Texture>();
@@ -130,7 +131,7 @@ public class DualPlayState extends State {
                     String name = data.getString("name");
                     String skin = data.getString("skin");
                     Gdx.app.log("SocketIO", "New Player Connect: " + id);
-                    mingi.put(playerId, new Ball(ball.getPozitie().x, ball.getPozitie().y));
+                    mingi.put(playerId, new DualBall(ball.getPozitie().x, ball.getPozitie().y));
                     nume.put(playerId, name);
                     if (find(SettingsState.numeMingi, skin) != -1)
                         skinuri.put(playerId, skin);
@@ -177,7 +178,7 @@ public class DualPlayState extends State {
                         String playerId = objects.getJSONObject(i).getString("id");
                         position.x = ((Double) objects.getJSONObject(i).getDouble("x")).floatValue();
                         position.y = ((Double) objects.getJSONObject(i).getDouble("y")).floatValue();
-                        mingi.put(playerId, new Ball(position.y, position.x));
+                        mingi.put(playerId, new DualBall(position.y, position.x));
                         nume.put(playerId, objects.getJSONObject(i).getString("nume"));
                         skinuri.put(playerId, objects.getJSONObject(i).getString("skin"));
                         Gdx.app.log("pozitie", position.x + "  " + position.y);
@@ -205,8 +206,8 @@ public class DualPlayState extends State {
 
     private void connectSocket() {
         try {
-            socket = IO.socket("https://arcane-island-35712.herokuapp.com");
-            //socket = IO.socket("http://localhost:8080");
+            //socket = IO.socket("https://arcane-island-35712.herokuapp.com");
+            socket = IO.socket("http://localhost:8080");
             socket.connect();
             JSONObject data = new JSONObject();
             data.put("nume", preferences.getString("nume", ""));
@@ -306,15 +307,15 @@ public class DualPlayState extends State {
         sb.begin();
         sb.draw(bg, 0, cam.position.y - cam.viewportHeight / 2, 480, 800);
 
-        for (Map.Entry<String, Ball> entry : mingi.entrySet()) {
+        for (Map.Entry<String, DualBall> entry : mingi.entrySet()) {
             sb.draw(texturi.get(skinuri.get(entry.getKey())),
-                    entry.getValue().getPozitie().x,
-                    entry.getValue().getPozitie().y);
+                    entry.getValue().x,
+                    entry.getValue().y);
             glyphLayout.setText(font, nume.get(entry.getKey()));
             font.draw(sb,
                     nume.get(entry.getKey()),
-                    entry.getValue().getPozitie().x - glyphLayout.width / 2 + 75 / 2,
-                    entry.getValue().getPozitie().y + 25);
+                    entry.getValue().x - glyphLayout.width / 2 + 75 / 2,
+                    entry.getValue().y + 25);
         }
         for (Platforma plat : platforme) {
             if (plat.isDestroyed() == false) {
