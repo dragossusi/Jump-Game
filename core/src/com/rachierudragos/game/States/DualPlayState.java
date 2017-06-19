@@ -34,7 +34,7 @@ import io.socket.emitter.Emitter;
  */
 public class DualPlayState extends State {
     private static final int numarPlatforme = 7;
-    private static final float UPDATE_TIME = (float) 1 / 10;
+    private static final float UPDATE_TIME = 10 ;
     private float timer;
     private String id;
     private HashMap<String, DualBall> mingi;
@@ -61,7 +61,7 @@ public class DualPlayState extends State {
     private GlyphLayout glyphLayout;
     private GlyphLayout glyphLayout2;
     private float lastOne;
-    private float nextSponge = 40 * 120;
+    private float nextSponge = 5 * 120;
     //private ShapeRenderer shapeRenderer;
 
     protected DualPlayState(GameStateManager gsm) {
@@ -251,7 +251,7 @@ public class DualPlayState extends State {
             ball.update(dt);
             //update platforme
             for (Platforma plat : platforme) {
-                if (cam.position.y - cam.viewportHeight / 2 > plat.getPozitie().y + 20) {
+                if (cam.position.y - cam.viewportHeight * 0.5 > plat.getPozitie().y + 20) {
                     plat.reposition(plat.getPozitie().y + 120 * numarPlatforme);
                 }
                 plat.update(dt);
@@ -260,10 +260,9 @@ public class DualPlayState extends State {
             if (ball.getPozitie().y > cam.position.y + 100)
                 cam.position.y = ball.getPozitie().y - 100;
             //in caz ca viteza e negativa verifica coliziuni
-            if (ball.getViteza().y < 0) {
+            if (ball.getViteza().y < 0 && !poate) {
                 for (Platforma plat : platforme)
                     //mingea loveste o platforma
-                    if (!poate)
                         if (ball.getPozitie().y > plat.getPozitie().y - 5 && plat.collides(ball)) {
                             if (plat.isDestroyed() == false) {
                                 ball.jump();
@@ -275,8 +274,8 @@ public class DualPlayState extends State {
                                     lastOne = plat.getPozitie().y;
                                     glyphLayout2.setText(font, String.valueOf(lastOne / 120 - 1));
                                 }
+                            }
                         }
-                    }
             }
             if (spongeBob != null)
                 //mingea e deasupra la spongebob
@@ -315,7 +314,7 @@ public class DualPlayState extends State {
             font.draw(sb,
                     nume.get(entry.getKey()),
                     entry.getValue().x - glyphLayout.width / 2 + 75 / 2,
-                    entry.getValue().y + 25);
+                    entry.getValue().y);
         }
         for (Platforma plat : platforme) {
             if (plat.isDestroyed() == false) {

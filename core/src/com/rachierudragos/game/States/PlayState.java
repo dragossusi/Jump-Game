@@ -129,7 +129,7 @@ public class PlayState extends State {
         sb.draw(ballTexture, ball.getPozitie().x, ball.getPozitie().y);
         font.draw(sb, String.valueOf((int) lastOne / 120 - 1), MyGame.WIDTH / 2 - glyphLayout.width / 2, cam.position.y + 350);
         sb.end();
-        /*collides*/
+        /*collides/
         shapeRenderer.setProjectionMatrix(cam.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.CYAN);
