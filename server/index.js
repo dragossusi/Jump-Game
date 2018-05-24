@@ -2,8 +2,8 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var players = [];
-var nume;
-var skin;
+//var nume;
+//var skin;
 server.listen(8080, function(){
 	console.log("Server is now running...");
 });
@@ -33,12 +33,12 @@ io.on('connection', function(socket){
 	socket.emit('getPlayers', players);
 	socket.on('disconnect', function(){
 		console.log("Player Disconnected");
-		socket.broadcast.emit('playerDisconnected', { id: socket.id });
 		for(var i = 0; i < players.length; i++){
 			if(players[i].id == socket.id){
 				players.splice(i, 1);
 			}
         }
+		socket.broadcast.emit('playerDisconnected', { id: socket.id });
 	});
     players.push(new player(socket.id, nume, 0, 0));
 });

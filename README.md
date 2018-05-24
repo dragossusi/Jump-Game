@@ -1,1 +1,3 @@
-# Sanatate noroc si minte, in ordinea aceasta
+# Jump
+
+Un joc gen Doodle Jump
